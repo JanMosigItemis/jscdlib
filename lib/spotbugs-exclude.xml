@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+	<!-- I guess this is a false positive, because SpotBugs falsely identifies the interface as being anonymous. -->
+    <Match>
+        <Class name="de.itemis.mosig.jassuan._onexit_t$0" />
+        <Method name="allocate" />
+		<Bug pattern="UMAC_UNCALLABLE_METHOD_OF_ANONYMOUS_CLASS" />
+	</Match>
+	<!-- I guess this is a false positive, because SpotBugs falsely identifies the interface as being anonymous. -->
+	<Match>
+        <Class name="de.itemis.mosig.jassuan._onexit_t$0" />
+        <Method name="ofAddress" />
+		<Bug pattern="UMAC_UNCALLABLE_METHOD_OF_ANONYMOUS_CLASS" />
+	</Match>
+	<!-- Can't reasonably force naming conventions on generated code. -->
+	<Match>
+        <Bug pattern="NM_CLASS_NAMING_CONVENTION" />
+    </Match>
+	<!-- Can't reasonably force naming conventions on generated code. -->
+	<Match>
+		<Bug pattern="NM_METHOD_NAMING_CONVENTION" />
+	</Match>
+	<!-- Can't reasonably refactor generated code so that the class becomes smaller. -->
+	<Match>
+		<Bug pattern="SKIPPED_CLASS_TOO_BIG" />
+	</Match>
+</FindBugsFilter>

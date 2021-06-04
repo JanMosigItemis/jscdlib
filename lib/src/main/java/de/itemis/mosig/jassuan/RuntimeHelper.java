@@ -27,7 +27,7 @@ final class RuntimeHelper {
     private final static CLinker LINKER = CLinker.getInstance();
     private final static ClassLoader LOADER = RuntimeHelper.class.getClassLoader();
     private final static MethodHandles.Lookup MH_LOOKUP = MethodHandles.lookup();
-
+	
     static SymbolLookup lookup() {
         SymbolLookup loaderLookup = SymbolLookup.loaderLookup();
         SymbolLookup systemLookup = CLinker.systemLookup();
