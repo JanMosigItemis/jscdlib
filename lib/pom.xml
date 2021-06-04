@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>de.itemis.mosig.jassuan</groupId>
-    <artifactId>de.itemis.mosig.jassuan</artifactId>
+    <artifactId>de.itemis.mosig.jassuan.lib</artifactId>
     <version>1.0.0-SNAPSHOT</version>
 
     <name>jAssuan</name>
@@ -15,37 +15,37 @@
 
     <licenses>
         <license>
-            <name>License name goes here</name>
-            <url>some.url.to.the.license</url>
+            <name>GNU LGPLv2.1</name>
+            <url>https://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt</url>
             <distribution>manual</distribution>
         </license>
     </licenses>
 
     <developers>
         <developer>
-            <id>DevId</id>
-            <name>Full name</name>
-            <organization>Optional organization</organization>
-            <organizationUrl>some.organization.url</organizationUrl>
-            <email>some@email.address</email>
+            <id>JanMosigItemis</id>
+            <name>Jan Mosig</name>
+            <organization>itemis AG</organization>
+            <organizationUrl>https://www.itemis.com/en</organizationUrl>
+            <email>jan.mosig@itemis.de</email>
             <timezone>Europe/Berlin</timezone>
-            <url>dev's website</url>
+            <url>https://github.com/JanMosigItemis</url>
         </developer>
     </developers>
 
+    <url>https://github.com/JanMosigItemis/jassuan</url>
+
     <scm>
-        <connection>scm:git:url.to.git.repo</connection>
-        <developerConnection>scm:git:url.to.git.repo</developerConnection>
+        <connection>scm:git:https://github.com/JanMosigItemis/jassuan</connection>
+        <developerConnection>scm:git:https://github.com/JanMosigItemis/jassuan</developerConnection>
         <tag>HEAD</tag>
-        <url>url.to.git.repo</url>
+        <url>https://github.com/JanMosigItemis/jassuan</url>
     </scm>
 
     <organization>
-        <name>organization's name</name>
-        <url>organization.url</url>
+        <name>itemis AG</name>
+        <url>https://www.itemis.com/en</url>
     </organization>
-
-    <url>project.website</url>
 
     <properties>
         <java.version>17</java.version>
@@ -60,7 +60,6 @@
         <maven-clean-plugin.version>3.1.0</maven-clean-plugin.version>
         <maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
-        <maven-exec-plugin.version>3.0.0</maven-exec-plugin.version>
         <maven-help-plugin.version>3.0.1</maven-help-plugin.version>
         <build.timestamp.formatted>${maven.build.timestamp}</build.timestamp.formatted>
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm.ssZ</maven.build.timestamp.format>
@@ -68,14 +67,9 @@
             These will be expanded by the maven build as soon as the resources plugin processes all contents of the configured
             resources directories. -->
         <resource.delimiter>${*}</resource.delimiter>
-        <guava.version>30.1.1-jre</guava.version>
-        <mockito.version>3.10.0</mockito.version>
-        <hamcrest.version>2.2</hamcrest.version>
         <spotbugs.version>4.2.3</spotbugs.version>
         <junit.version>5.7.2</junit.version>
         <git-commit-id-plugin.version>4.0.4</git-commit-id-plugin.version>
-        <assertj.version>3.19.0</assertj.version>
-        <logback.version>1.2.3</logback.version>
         <!-- Currently no custom options are set but we need to define this variable
             anyway, so that it gets replaced with 'empty' upon runtime. -->
         <custom.jvm.options></custom.jvm.options>
@@ -83,24 +77,12 @@
 
     <dependencyManagement>
         <dependencies>
-            <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
-            <dependency>
-                <groupId>com.google.guava</groupId>
-                <artifactId>guava</artifactId>
-                <version>${guava.version}</version>
-            </dependency>
             <dependency>
                 <!-- Required to support null annotation checks according
                     to JSR-305 -->
                 <groupId>com.github.spotbugs</groupId>
                 <artifactId>spotbugs</artifactId>
                 <version>${spotbugs.version}</version>
-            </dependency>
-            <!-- https://mvnrepository.com/artifact/ch.qos.logback/logback-classic -->
-            <dependency>
-                <groupId>ch.qos.logback</groupId>
-                <artifactId>logback-classic</artifactId>
-                <version>${logback.version}</version>
             </dependency>
             <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
             <dependency>
@@ -116,46 +98,10 @@
                 <version>${junit.version}</version>
                 <scope>test</scope>
             </dependency>
-            <!-- https://mvnrepository.com/artifact/org.mockito/mockito-core -->
-            <dependency>
-                <groupId>org.mockito</groupId>
-                <artifactId>mockito-core</artifactId>
-                <version>${mockito.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <!-- https://mvnrepository.com/artifact/org.mockito/mockito-junit-jupiter -->
-            <dependency>
-                <groupId>org.mockito</groupId>
-                <artifactId>mockito-junit-jupiter</artifactId>
-                <version>${mockito.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <!-- https://mvnrepository.com/artifact/org.hamcrest/hamcrest -->
-            <dependency>
-                <groupId>org.hamcrest</groupId>
-                <artifactId>hamcrest</artifactId>
-                <version>${hamcrest.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <!-- https://mvnrepository.com/artifact/org.assertj/assertj-core -->
-            <dependency>
-                <groupId>org.assertj</groupId>
-                <artifactId>assertj-core</artifactId>
-                <version>${assertj.version}</version>
-                <scope>test</scope>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 
     <dependencies>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-        </dependency>
         <dependency>
             <!-- Required to support null annotation checks according to
                 JSR-305 -->
@@ -172,26 +118,6 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-junit-jupiter</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hamcrest</groupId>
-            <artifactId>hamcrest</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.assertj</groupId>
-            <artifactId>assertj-core</artifactId>
             <scope>test</scope>
         </dependency>
         <!-- End of test dependencies -->
@@ -244,11 +170,6 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>${maven-compiler-plugin.version}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>exec-maven-plugin</artifactId>
-                    <version>${maven-exec-plugin.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -320,17 +241,6 @@
                 </executions>
                 <configuration>
                     <excludeFilterFile>spotbugs-exclude.xml</excludeFilterFile>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <!-- We are not using built-in java support. Instead, we are explicitly calling the java binary.
-                    This gives us the opportunity to pass JVM arguments. Otherwise those arguments would have been passed to the JVM running the maven process which 
-                    then calls this plugin. -->
-                <configuration>
-                    <executable>java</executable>
-                    <commandlineArgs>-jar ${project.build.directory}/${project.build.finalName}.jar</commandlineArgs>
                 </configuration>
             </plugin>
             <plugin>

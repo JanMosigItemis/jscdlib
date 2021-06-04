@@ -10,7 +10,7 @@ import static jdk.incubator.foreign.CLinker.*;
 public class assuan_h extends assuan_h_31 {
 
     static {
-        System.loadLibrary("libassuan6-0");
+        System.loadLibrary("libassuan");
     }
 
     static final SymbolLookup LIBRARIES = RuntimeHelper.lookup();    /* package-private */ assuan_h() {}
