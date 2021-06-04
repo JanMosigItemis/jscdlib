@@ -6,8 +6,8 @@ import org.slf4j.LoggerFactory;
 /**
  * Hello world!
  */
-public class App {
-    private static final Logger LOG = LoggerFactory.getLogger(App.class);
+public class JScdLib {
+    private static final Logger LOG = LoggerFactory.getLogger(JScdLib.class);
     
     public static void main(String[] args) {
         var msg = "Hello World!";

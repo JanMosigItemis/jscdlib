@@ -1,7 +1,6 @@
 package de.itemis.mosig.jassuan.jscdlib;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,14 +8,14 @@ import org.slf4j.LoggerFactory;
 /**
  * Unit test for simple App.
  */
-public class AppTest {
-    private static final Logger LOG = LoggerFactory.getLogger(AppTest.class);
+public class JScdLibTest {
+    private static final Logger LOG = LoggerFactory.getLogger(JScdLibTest.class);
 
     @Test
     public void test_something() {
-        assertThat(true).isTrue();
+        Assertions.assertThat(true).isTrue();
 
-        App.main(null);
+        JScdLib.main(null);
         LOG.debug("Log from test");
     }
 }
