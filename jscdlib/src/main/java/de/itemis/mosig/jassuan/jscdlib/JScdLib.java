@@ -4,14 +4,25 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Hello world!
+ * Entrypoint for the JScdLib.
  */
-public class JScdLib {
+public final class JScdLib {
     private static final Logger LOG = LoggerFactory.getLogger(JScdLib.class);
-    
-    public static void main(String[] args) {
-        var msg = "Hello World!";
-        System.out.println("Sysout: " + msg);
-        LOG.info("Logger: " + msg);
+
+    /**
+     * <p>
+     * Create a new handle. The handle will use the provided {@code nativeBridge} to call underlying
+     * system libraries.
+     * </p>
+     * <p>
+     * <b>Be aware:</b> The handle does hold resources and should therefore be closed when not
+     * needed anymore in order to prevent resource leaks.
+     * </p>
+     *
+     * @param nativeBridge
+     * @return A new instance of {@link JScdHandle}.
+     */
+    public static JScdHandle createHandle(JAssuanNative nativeBridge) {
+        return new JScdHandle(nativeBridge);
     }
 }
