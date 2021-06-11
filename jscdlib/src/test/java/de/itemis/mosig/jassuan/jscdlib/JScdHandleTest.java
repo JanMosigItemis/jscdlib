@@ -13,18 +13,23 @@ import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.List;
 
 import de.itemis.mosig.fluffy.tests.java.FluffyTestHelper;
+import de.itemis.mosig.jassuan.jscdlib.internal.IntSegment;
+import de.itemis.mosig.jassuan.jscdlib.internal.StringPointerSegment;
+import de.itemis.mosig.jassuan.jscdlib.internal.StringSegment;
 import jdk.incubator.foreign.Addressable;
-import jdk.incubator.foreign.CLinker;
 import jdk.incubator.foreign.MemoryAddress;
 
 public class JScdHandleTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(JScdHandleTest.class);
+
+    private static final String READER_ONE = "readerOne";
+    private static final String READER_TWO = "readerTwo";
 
     private JAssuanNative nativeMock;
     private JScdHandle underTest;
@@ -32,6 +37,7 @@ public class JScdHandleTest {
     @BeforeEach
     public void setUp() {
         nativeMock = Mockito.mock(JAssuanNative.class);
+
         underTest = JScdLib.createHandle(nativeMock);
     }
 
@@ -58,31 +64,52 @@ public class JScdHandleTest {
 
     @Test
     public void test_listReaders_returns_list() {
+        setupAvailableReaders(READER_ONE);
         assertThat(underTest.listReaders()).as("Method must return a list").isInstanceOf(List.class);
     }
 
     @Test
     public void test_listReaders_returns_immutable_list() {
+        setupAvailableReaders(READER_ONE);
         assertThatThrownBy(() -> underTest.listReaders().add("testString")).as("list of readers must be immutable")
             .isInstanceOf(UnsupportedOperationException.class);
     }
 
     @Test
-    public void when_one_reader_available_return_its_name_as_list() {
-        String expectedReaderName = "testReaderName";
+    public void when_one_reader_is_available_return_its_name_as_list() {
+        setupAvailableReaders(READER_ONE);
+        assertThat(underTest.listReaders()).containsExactly(READER_ONE);
+    }
+
+    @Test
+    public void when_multiple_readers_are_available_return_their_names_as_list() {
+        setupAvailableReaders(READER_ONE, READER_TWO);
+        assertThat(underTest.listReaders()).containsExactly(READER_ONE, READER_TWO);
+        // System.out.println(CLinker.toJavaStringRestricted(CLinker.toCString("eins\0zwei\0\0",
+        // StandardCharsets.UTF_8).address().addOffset(5)));
+    }
+
+    private void setupAvailableReaders(String... readerNames) {
+
         when(nativeMock.sCardListReadersA(any(Addressable.class), any(Addressable.class), any(Addressable.class),
             any(Addressable.class))).then(invocation -> {
-                var readerListPtrSegPtr = invocation.getArgument(2, MemoryAddress.class);
-                byte[] expectedReaderListBytes = expectedReaderName.getBytes(StandardCharsets.UTF_8);
-                var readerListPtrSeg = readerListPtrSegPtr.asSegmentRestricted(expectedReaderListBytes.length);
-                var readerList = CLinker.toCString(expectedReaderName, StandardCharsets.UTF_8);
-                var addr = readerList.address().toRawLongValue();
-                readerListPtrSeg.asByteBuffer().order(ByteOrder.nativeOrder()).putLong(addr);
+                var addrOfReaderListPtr = invocation.getArgument(2, MemoryAddress.class);
+                var addrOfReaderListLength = invocation.getArgument(3, MemoryAddress.class);
+
+                var readerList = new StringSegment();
+                var ptrToReaderList = new StringPointerSegment(addrOfReaderListPtr);
+                var readerListLength = new IntSegment(addrOfReaderListLength);
+                var readerListMultiStringBuilder = new StringBuilder("");
+                Arrays.stream(readerNames).forEach(reader -> {
+                    readerListMultiStringBuilder.append(reader);
+                    readerListMultiStringBuilder.append('\0');
+                });
+                readerListMultiStringBuilder.append('\0');
+                String readerListMultiString = readerListMultiStringBuilder.toString();
+                readerList.setValue(readerListMultiString);
+                readerListLength.setValue(readerListMultiString.getBytes(StandardCharsets.UTF_8).length);
+                ptrToReaderList.pointTo(readerList);
                 return SCARD_S_SUCCESS;
             });
-
-
-        assertThat(underTest.listReaders()).containsExactly(expectedReaderName);
-
     }
 }

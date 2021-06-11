@@ -1,21 +1,30 @@
 package de.itemis.mosig.jassuan.jscdlib.internal;
 
+import static jdk.incubator.foreign.MemoryAddress.ofLong;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.lang.ref.Cleaner;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
+import jdk.incubator.foreign.MemoryAddress;
 import jdk.incubator.foreign.MemorySegment;
 import jdk.incubator.foreign.NativeScope;
 import jdk.incubator.foreign.SequenceLayout;
 
 public class MemorySegmentDelegateTest {
+
+    private static final byte[] EXPECTED_CONTENTS = new byte[] {1, 2, 3};
+    private static final long EXPECTED_BYTE_SIZE = EXPECTED_CONTENTS.length;
 
     private MemorySegment origSeg;
     private MemorySegmentDelegate underTest;
@@ -23,7 +32,57 @@ public class MemorySegmentDelegateTest {
     @BeforeEach
     public void setUp() {
         origSeg = Mockito.mock(MemorySegment.class);
+
         underTest = new MemorySegmentDelegate(origSeg);
+    }
+
+    @Test
+    public void test_segment_is_created_from_address() {
+
+        try (var seg = MemorySegment.allocateNative(EXPECTED_BYTE_SIZE)) {
+            seg.asByteBuffer().put(EXPECTED_CONTENTS);
+            var underTest = new MemorySegmentDelegate(seg.address(), EXPECTED_BYTE_SIZE);
+
+            assertThat(underTest.address()).as("segment objects must have same address").isEqualTo(seg.address());
+            assertThat(underTest.getBuf()).as("segment objects must hold the same value").isEqualByComparingTo(ByteBuffer.wrap(EXPECTED_CONTENTS));
+        }
+    }
+
+    @Test
+    public void constructor_does_not_accept_null_addr() {
+        assertThatThrownBy(() -> new MemorySegmentDelegate(null, EXPECTED_BYTE_SIZE)).isInstanceOf(NullPointerException.class).hasMessage("addr");
+    }
+
+    @Test
+    public void constructor_does_not_accept_zero_byteSize() {
+        assertThatThrownBy(() -> new MemorySegmentDelegate(ofLong(EXPECTED_BYTE_SIZE), 0)).isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("byteSize");
+    }
+
+    @Test
+    public void constructor_does_not_accept_negative_byteSize() {
+        assertThatThrownBy(() -> new MemorySegmentDelegate(ofLong(EXPECTED_BYTE_SIZE), -1)).isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("byteSize");
+    }
+
+    @Test
+    public void constructor_does_not_accept_null_addr_obj() {
+        assertThatThrownBy(() -> new MemorySegmentDelegate(MemoryAddress.NULL, EXPECTED_BYTE_SIZE)).isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("NULL");
+    }
+
+    @Test
+    public void constructor_does_not_accept_null_segment() {
+        assertThatThrownBy(() -> new MemorySegmentDelegate(null)).isInstanceOf(NullPointerException.class).hasMessage("segment");
+    }
+
+    @Test
+    public void test_getBuf() {
+        var expectedBuf = ByteBuffer.wrap(new byte[] {1, 2, 3}).order(ByteOrder.nativeOrder());
+        when(origSeg.asByteBuffer()).thenReturn(expectedBuf);
+        ByteBuffer actualBuf = underTest.getBuf();
+        assertThat(actualBuf).isEqualByComparingTo(expectedBuf);
+        assertThat(actualBuf.order()).isSameAs(ByteOrder.nativeOrder());
     }
 
     @Test

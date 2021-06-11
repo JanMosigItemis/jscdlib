@@ -1,7 +1,11 @@
 package de.itemis.mosig.jassuan.jscdlib.internal;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static java.util.Objects.requireNonNull;
+
 import java.lang.ref.Cleaner;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.Spliterator;
 
 import jdk.incubator.foreign.MemoryAddress;
@@ -10,10 +14,27 @@ import jdk.incubator.foreign.NativeScope;
 import jdk.incubator.foreign.SequenceLayout;
 
 public class MemorySegmentDelegate implements MemorySegment {
-    private final MemorySegment segment;
+    static final ByteOrder BYTE_ORDER = ByteOrder.nativeOrder();
+
+    private MemorySegment segment;
+
+    public MemorySegmentDelegate(MemoryAddress addr, long byteSize) {
+        requireNonNull(addr, "addr");
+        checkArgument(addr != MemoryAddress.NULL, "Instances of this class do not work with the NULL address.");
+        checkArgument(byteSize > 0, "byteSize must be greater than 0");
+        this.segment = addr.asSegmentRestricted(byteSize);
+    }
 
     public MemorySegmentDelegate(MemorySegment segment) {
-        this.segment = segment;
+        this.segment = requireNonNull(segment, "segment");
+    }
+
+    final ByteBuffer getBuf() {
+        return getSegment().asByteBuffer().order(BYTE_ORDER);
+    }
+
+    final void setSegment(MemorySegment newSegment) {
+        this.segment = newSegment;
     }
 
     final MemorySegment getSegment() {

@@ -17,6 +17,17 @@ public interface JAssuanNative {
     public static final int SCARD_AUTOALLOCATE = -1;
 
     /**
+     * Database operations are performed within the domain of the user.
+     */
+    public static final long PCSC_SCOPE_SYSTEM = 2;
+
+    /**
+     * Database operations are performed within the domain of the system. The calling application
+     * must have appropriate access permissions for any database actions.
+     */
+    public static final long PCSC_SCOPE_USER = 0;
+
+    /**
      * Success
      */
     public static final long SCARD_S_SUCCESS = 0x0;
@@ -31,13 +42,27 @@ public interface JAssuanNative {
 
     /**
      * See <a href=
+     * "https://docs.microsoft.com/en-us/windows/win32/api/winscard/nf-winscard-scardestablishcontext">https://docs.microsoft.com/en-us/windows/win32/api/winscard/nf-winscard-scardestablishcontext</a>
+     *
+     * @param dwScope - {@link #PCSC_SCOPE_SYSTEM} or {@link #PCSC_SCOPE_USER}.
+     * @param pvReserved1 - Reserved for future use and must be {@link MemoryAddress#NULL}.
+     * @param pvReserved2 - Reserved for future use and must be {@link MemoryAddress#NULL}.
+     * @param phContext
+     * @return {@link #SCARD_S_SUCCESS} if success, else error code according to <a href=
+     *         "https://docs.microsoft.com/en-us/windows/win32/secauthn/authentication-return-values">SmartCard
+     *         return values</a>.
+     */
+    long sCardEstablishContext(long dwScope, Addressable pvReserved1, Addressable pvReserved2, Addressable phContext);
+
+    /**
+     * See <a href=
      * "https://docs.microsoft.com/en-us/windows/win32/api/winscard/nf-winscard-scardlistreadersa">https://docs.microsoft.com/en-us/windows/win32/api/winscard/nf-winscard-scardlistreadersa</a>
      *
      * @param hContext
      * @param mszGroups
      * @param mszReaders
      * @param pcchReaders
-     * @return error code according to <a href=
+     * @return {@link #SCARD_S_SUCCESS} if success, else error code according to <a href=
      *         "https://docs.microsoft.com/en-us/windows/win32/secauthn/authentication-return-values">SmartCard
      *         return values</a>.
      */

@@ -1,13 +1,9 @@
 package de.itemis.mosig.jassuan.jscdlib;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * Entrypoint for the JScdLib.
  */
 public final class JScdLib {
-    private static final Logger LOG = LoggerFactory.getLogger(JScdLib.class);
 
     /**
      * <p>

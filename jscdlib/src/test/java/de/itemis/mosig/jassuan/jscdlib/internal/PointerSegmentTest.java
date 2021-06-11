@@ -1,60 +1,91 @@
 package de.itemis.mosig.jassuan.jscdlib.internal;
 
-import static java.nio.ByteOrder.nativeOrder;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import jdk.incubator.foreign.MemoryAddress;
+import jdk.incubator.foreign.MemorySegment;
 
 public class PointerSegmentTest {
 
-    private PointerSegment<String> underTest;
-
-    @BeforeEach
-    public void setUp() {
-        underTest = new PointerSegment<>() {
-            @Override
-            public String dereference() {
-                return null;
-            }
-        };
-    }
+    private PointerSegment<Object> underTest;
 
     @AfterEach
     public void tearDown() {
-        if (underTest != null) {
+        if (underTest != null && underTest.isAlive()) {
             underTest.close();
         }
     }
 
     @Test
+    public void pointTo_addr_changes_contents() {
+        var expectedAddr = MemoryAddress.ofLong(123L);
+        underTest = constructSeg();
+        underTest.pointTo(expectedAddr);
+
+        assertThat(underTest.getContainedAddress()).isEqualTo(expectedAddr);
+        assertThat(underTest.getValue()).isEqualTo(expectedAddr.toRawLongValue());
+    }
+
+    @Test
+    public void pointTo_seg_changes_contents() {
+        try (var testSeg = MemorySegment.allocateNative(3)) {
+            var expectedAddr = testSeg.address();
+            underTest = constructSeg();
+            underTest.pointTo(testSeg);
+
+            assertThat(underTest.getContainedAddress()).isEqualTo(expectedAddr);
+            assertThat(underTest.getValue()).isEqualTo(expectedAddr.toRawLongValue());
+        }
+    }
+
+    @Test
+    public void no_arg_constructor_creates_new_seg_containing_zero() {
+        underTest = constructSeg();
+        assertThat(underTest.getValue()).isEqualTo(0L);
+    }
+
+    @Test
     public void getContainedAddress_returns_address() {
-        long expectedContents = 123L;
-        underTest.pointTo(expectedContents);
-        assertThat(underTest.getContainedAddress().toRawLongValue()).isEqualTo(expectedContents);
+        var expectedValue = 123L;
+        try (var seg = new LongSegment()) {
+            underTest = constructSeg(seg.address());
+            underTest.setValue(expectedValue);
+            assertThat(underTest.getContainedAddress().toRawLongValue()).isEqualTo(expectedValue);
+        }
     }
 
     @Test
-    public void test_pointTo_with_long_sets_contents_correctly() {
-        long expectedContents = 123L;
-        underTest.pointTo(expectedContents);
-        assertThat(underTest.asByteBuffer().order(nativeOrder()).getLong()).isEqualTo(expectedContents);
+    public void constructor_with_addr_sets_addr_correctly() {
+        long addr = 123L;
+        MemoryAddress expectedAddr = MemoryAddress.ofLong(addr);
+        underTest = constructSeg(expectedAddr);
+        assertThat(underTest.address()).isEqualTo(expectedAddr);
     }
 
     @Test
-    public void test_pointTo_with_addr_sets_contents_correctly() {
-        long expectedContents = 123L;
-        MemoryAddress addr = MemoryAddress.ofLong(expectedContents);
-        underTest.pointTo(addr);
-        assertThat(underTest.asByteBuffer().order(nativeOrder()).getLong()).isEqualTo(expectedContents);
+    public void test_addr_constructor_does_not_accept_null() {
+        assertThatThrownBy(() -> constructSeg(null)).isInstanceOf(NullPointerException.class).hasMessage("addr");
     }
 
-    @Test
-    public void test_pointTo_does_not_accept_null() {
-        assertThatThrownBy(() -> underTest.pointTo(null)).isInstanceOf(NullPointerException.class).hasMessage("addr");
+    private PointerSegment<Object> constructSeg() {
+        return new PointerSegment<Object>() {
+            @Override
+            public Object dereference() {
+                return null;
+            }
+        };
+    }
+
+    private PointerSegment<Object> constructSeg(MemoryAddress addr) {
+        return new PointerSegment<>(addr) {
+            @Override
+            public Object dereference() {
+                return null;
+            }
+        };
     }
 }
