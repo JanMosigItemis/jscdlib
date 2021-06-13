@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
@@ -63,9 +64,9 @@
         <maven-help-plugin.version>3.0.1</maven-help-plugin.version>
         <build.timestamp.formatted>${maven.build.timestamp}</build.timestamp.formatted>
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm.ssZ</maven.build.timestamp.format>
-        <!-- Make sure we can use variables like ${variable.name} in resource files.
-            These will be expanded by the maven build as soon as the resources plugin processes all contents of the configured
-            resources directories. -->
+        <!-- Make sure we can use variables like ${variable.name} in resource 
+            files. These will be expanded by the maven build as soon as the resources 
+            plugin processes all contents of the configured resources directories. -->
         <resource.delimiter>${*}</resource.delimiter>
         <guava.version>30.1.1-jre</guava.version>
         <mockito.version>3.11.0</mockito.version>
@@ -80,9 +81,7 @@
         <awaitility.version>4.1.0</awaitility.version>
         <arch.unit.version>0.19.0</arch.unit.version>
         <fluffy.tests.version>1.0.0-SNAPSHOT</fluffy.tests.version>
-        <!-- Currently no custom options are set but we need to define this variable
-            anyway, so that it gets replaced with 'empty' upon runtime. -->
-        <custom.jvm.options></custom.jvm.options>
+        <custom.jvm.options>-Dforeign.restricted=permit --add-modules=jdk.incubator.foreign</custom.jvm.options>
     </properties>
 
     <dependencyManagement>
@@ -94,7 +93,7 @@
                 <version>${guava.version}</version>
             </dependency>
             <dependency>
-                <!-- Required to support null annotation checks according
+                <!-- Required to support null annotation checks according 
                     to JSR-305 -->
                 <groupId>com.github.spotbugs</groupId>
                 <artifactId>spotbugs</artifactId>
@@ -183,7 +182,7 @@
             <artifactId>logback-classic</artifactId>
         </dependency>
         <dependency>
-            <!-- Required to support null annotation checks according to
+            <!-- Required to support null annotation checks according to 
                 JSR-305 -->
             <groupId>com.github.spotbugs</groupId>
             <artifactId>spotbugs</artifactId>
@@ -339,6 +338,12 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>${maven-compiler-plugin.version}</version>
+                    <configuration>
+                        <compilerArgs>
+                            <compilerArg>--add-modules</compilerArg>
+                            <compilerArg>jdk.incubator.foreign</compilerArg>
+                        </compilerArgs>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -386,13 +391,13 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <!-- Try to avoid concurrency issues as much as possible. -->
-                    <!-- This will have a negative impact on memory consumption an build speed. -->
-                    <reuseForks>false</reuseForks>
-                    <!-- $argLine is 'injected' by JaCoCo and contains instructions to setup its agent -->
-                    <argLine>${argLine}
-                        ${custom.jvm.options}
-                    </argLine>
+                    <!-- For the next to lines see: https://issues.apache.org/jira/browse/SUREFIRE-1919 -->
+                    <reuseForks>true</reuseForks>
+                    <forkCount>1</forkCount>
+                    <!-- $argLine is 'injected' by JaCoCo and contains instructions 
+                        to setup its agent -->
+                    <argLine>${argLine}</argLine>
+                    <argLine>${custom.jvm.options}</argLine>
                 </configuration>
             </plugin>
             <plugin>
