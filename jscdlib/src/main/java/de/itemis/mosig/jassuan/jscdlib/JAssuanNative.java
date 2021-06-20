@@ -1,6 +1,5 @@
 package de.itemis.mosig.jassuan.jscdlib;
 
-import jdk.incubator.foreign.Addressable;
 import jdk.incubator.foreign.MemoryAddress;
 
 /**
@@ -12,7 +11,7 @@ public interface JAssuanNative {
     /**
      * According to the spec, this is a null pointer.
      */
-    public static final Addressable SCARD_ALL_READERS = MemoryAddress.NULL;
+    public static final MemoryAddress SCARD_ALL_READERS = MemoryAddress.NULL;
 
     public static final int SCARD_AUTOALLOCATE = -1;
 
@@ -52,7 +51,7 @@ public interface JAssuanNative {
      *         "https://docs.microsoft.com/en-us/windows/win32/secauthn/authentication-return-values">SmartCard
      *         return values</a>.
      */
-    long sCardEstablishContext(long dwScope, Addressable pvReserved1, Addressable pvReserved2, Addressable phContext);
+    long sCardEstablishContext(long dwScope, MemoryAddress pvReserved1, MemoryAddress pvReserved2, MemoryAddress phContext);
 
     /**
      * See <a href=
@@ -66,6 +65,28 @@ public interface JAssuanNative {
      *         "https://docs.microsoft.com/en-us/windows/win32/secauthn/authentication-return-values">SmartCard
      *         return values</a>.
      */
-    long sCardListReadersA(Addressable hContext, Addressable mszGroups, Addressable mszReaders, Addressable pcchReaders);
+    long sCardListReadersA(MemoryAddress hContext, MemoryAddress mszGroups, MemoryAddress mszReaders, MemoryAddress pcchReaders);
 
+    /**
+     * See <a href=
+     * "https://docs.microsoft.com/en-us/windows/win32/api/winscard/nf-winscard-scardfreememory">https://docs.microsoft.com/en-us/windows/win32/api/winscard/nf-winscard-scardfreememory</a>
+     *
+     * @param hContext
+     * @param pvMem - Memory block to be released.
+     * @return {@link #SCARD_S_SUCCESS} if success, else error code according to <a href=
+     *         "https://docs.microsoft.com/en-us/windows/win32/secauthn/authentication-return-values">SmartCard
+     *         return values</a>.
+     */
+    long sCardFreeMemory(MemoryAddress hContext, MemoryAddress pvMem);
+
+    /**
+     * See <a href=
+     * "https://docs.microsoft.com/en-us/windows/win32/api/winscard/nf-winscard-scardreleasecontext">https://docs.microsoft.com/en-us/windows/win32/api/winscard/nf-winscard-scardreleasecontext</a>
+     *
+     * @param hContext
+     * @return {@link #SCARD_S_SUCCESS} if success, else error code according to <a href=
+     *         "https://docs.microsoft.com/en-us/windows/win32/secauthn/authentication-return-values">SmartCard
+     *         return values</a>.
+     */
+    long sCardReleaseContext(MemoryAddress hContext);
 }

@@ -1,27 +1,37 @@
 package de.itemis.mosig.jassuan.jscdlib;
 
+import static de.itemis.mosig.jassuan.jscdlib.JAssuanNative.PCSC_SCOPE_SYSTEM;
+import static de.itemis.mosig.jassuan.jscdlib.JAssuanNative.SCARD_ALL_READERS;
+import static de.itemis.mosig.jassuan.jscdlib.JAssuanNative.SCARD_AUTOALLOCATE;
 import static de.itemis.mosig.jassuan.jscdlib.JAssuanNative.SCARD_S_SUCCESS;
+import static jdk.incubator.foreign.MemoryAddress.NULL;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.itemis.mosig.fluffy.tests.java.FluffyTestHelper;
 import de.itemis.mosig.jassuan.jscdlib.internal.IntSegment;
+import de.itemis.mosig.jassuan.jscdlib.internal.LongPointerSegment;
+import de.itemis.mosig.jassuan.jscdlib.internal.LongSegment;
 import de.itemis.mosig.jassuan.jscdlib.internal.StringPointerSegment;
 import de.itemis.mosig.jassuan.jscdlib.internal.StringSegment;
-import jdk.incubator.foreign.Addressable;
 import jdk.incubator.foreign.MemoryAddress;
 
 public class JScdHandleTest {
@@ -31,12 +41,15 @@ public class JScdHandleTest {
     private static final String READER_ONE = "readerOne";
     private static final String READER_TWO = "readerTwo";
 
+    private SCardMethodInvocations invocations;
     private JAssuanNative nativeMock;
     private JScdHandle underTest;
 
     @BeforeEach
     public void setUp() {
-        nativeMock = Mockito.mock(JAssuanNative.class);
+        nativeMock = mock(JAssuanNative.class);
+        invocations = new SCardMethodInvocations();
+        setupAllMethodsSuccess();
 
         underTest = JScdLib.createHandle(nativeMock);
     }
@@ -85,31 +98,71 @@ public class JScdHandleTest {
     public void when_multiple_readers_are_available_return_their_names_as_list() {
         setupAvailableReaders(READER_ONE, READER_TWO);
         assertThat(underTest.listReaders()).containsExactly(READER_ONE, READER_TWO);
-        // System.out.println(CLinker.toJavaStringRestricted(CLinker.toCString("eins\0zwei\0\0",
-        // StandardCharsets.UTF_8).address().addOffset(5)));
+    }
+
+    /**
+     * We cannot test against a real winscard.dll. Thus, we must make sure, the calls are correct
+     * and in expected order.
+     */
+    @Test
+    public void list_readers_happy_path_runs_expected_calls() {
+        setupAvailableReaders(READER_ONE);
+
+        assertThatNoException().isThrownBy(() -> underTest.listReaders());
+
+        var inOrder = inOrder(nativeMock);
+        inOrder.verify(nativeMock).sCardEstablishContext(eq(PCSC_SCOPE_SYSTEM), same(NULL), same(NULL), any(MemoryAddress.class));
+        inOrder.verify(nativeMock)
+            .sCardListReadersA(eq(invocations.hContext), eq(SCARD_ALL_READERS), any(MemoryAddress.class), any(MemoryAddress.class));
+        inOrder.verify(nativeMock).sCardFreeMemory(eq(invocations.hContext), eq(invocations.readerListPtr));
+        inOrder.verify(nativeMock).sCardReleaseContext(eq(invocations.hContext));
+    }
+
+    private void setupAllMethodsSuccess() {
+        when(nativeMock.sCardEstablishContext(anyLong(), any(MemoryAddress.class), any(MemoryAddress.class), any(MemoryAddress.class)))
+            .thenAnswer(invocation -> {
+                try (var ctxPtr = new LongPointerSegment(invocation.getArgument(3, MemoryAddress.class));
+                        var ctx = new LongSegment()) {
+                    ctxPtr.pointTo(ctx);
+                    invocations.hContext = ctxPtr.getContainedAddress();
+                    return SCARD_S_SUCCESS;
+                }
+            });
+
+        when(nativeMock.sCardListReadersA(any(MemoryAddress.class), any(MemoryAddress.class), any(MemoryAddress.class), any(MemoryAddress.class)))
+            .thenReturn(SCARD_S_SUCCESS);
+        when(nativeMock.sCardFreeMemory(any(MemoryAddress.class), any(MemoryAddress.class))).thenReturn(SCARD_S_SUCCESS);
+        when(nativeMock.sCardReleaseContext(any(MemoryAddress.class))).thenReturn(SCARD_S_SUCCESS);
     }
 
     private void setupAvailableReaders(String... readerNames) {
-
-        when(nativeMock.sCardListReadersA(any(Addressable.class), any(Addressable.class), any(Addressable.class),
-            any(Addressable.class))).then(invocation -> {
+        when(nativeMock.sCardListReadersA(any(MemoryAddress.class), any(MemoryAddress.class), any(MemoryAddress.class),
+            any(MemoryAddress.class))).then(invocation -> {
                 var addrOfReaderListPtr = invocation.getArgument(2, MemoryAddress.class);
                 var addrOfReaderListLength = invocation.getArgument(3, MemoryAddress.class);
 
-                var readerList = new StringSegment();
-                var ptrToReaderList = new StringPointerSegment(addrOfReaderListPtr);
-                var readerListLength = new IntSegment(addrOfReaderListLength);
-                var readerListMultiStringBuilder = new StringBuilder("");
-                Arrays.stream(readerNames).forEach(reader -> {
-                    readerListMultiStringBuilder.append(reader);
+                try (var readerList = new StringSegment();
+                        var ptrToReaderList = new StringPointerSegment(addrOfReaderListPtr);
+                        var readerListLength = new IntSegment(addrOfReaderListLength)) {
+                    assertThat(readerListLength.getValue()).as("Provided reader list length must be unset.").isEqualTo(SCARD_AUTOALLOCATE);
+                    var readerListMultiStringBuilder = new StringBuilder("");
+                    Arrays.stream(readerNames).forEach(reader -> {
+                        readerListMultiStringBuilder.append(reader);
+                        readerListMultiStringBuilder.append('\0');
+                    });
                     readerListMultiStringBuilder.append('\0');
-                });
-                readerListMultiStringBuilder.append('\0');
-                String readerListMultiString = readerListMultiStringBuilder.toString();
-                readerList.setValue(readerListMultiString);
-                readerListLength.setValue(readerListMultiString.getBytes(StandardCharsets.UTF_8).length);
-                ptrToReaderList.pointTo(readerList);
-                return SCARD_S_SUCCESS;
+                    String readerListMultiString = readerListMultiStringBuilder.toString();
+                    readerList.setValue(readerListMultiString);
+                    readerListLength.setValue(readerListMultiString.getBytes(StandardCharsets.UTF_8).length);
+                    ptrToReaderList.pointTo(readerList);
+                    invocations.readerListPtr = ptrToReaderList.getContainedAddress();
+                    return SCARD_S_SUCCESS;
+                }
             });
+    }
+
+    private static final class SCardMethodInvocations {
+        MemoryAddress hContext = null;
+        MemoryAddress readerListPtr = null;
     }
 }
