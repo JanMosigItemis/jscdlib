@@ -27,19 +27,6 @@ public interface JAssuanNative {
     public static final long PCSC_SCOPE_USER = 0;
 
     /**
-     * Success
-     */
-    public static final long SCARD_S_SUCCESS = 0x0;
-    /**
-     * Group contains no readers
-     */
-    public static final long SCARD_E_NO_READERS_AVAILABLE = 0x8010002E;
-    /**
-     * Specified reader is not currently available for use
-     */
-    public static final long SCARD_E_READER_UNAVAILABLE = 0x80100017;
-
-    /**
      * See <a href=
      * "https://docs.microsoft.com/en-us/windows/win32/api/winscard/nf-winscard-scardestablishcontext">https://docs.microsoft.com/en-us/windows/win32/api/winscard/nf-winscard-scardestablishcontext</a>
      *

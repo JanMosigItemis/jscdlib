@@ -3,7 +3,8 @@ package de.itemis.mosig.jassuan.jscdlib;
 import static de.itemis.mosig.jassuan.jscdlib.JAssuanNative.PCSC_SCOPE_SYSTEM;
 import static de.itemis.mosig.jassuan.jscdlib.JAssuanNative.SCARD_ALL_READERS;
 import static de.itemis.mosig.jassuan.jscdlib.JAssuanNative.SCARD_AUTOALLOCATE;
-import static de.itemis.mosig.jassuan.jscdlib.JAssuanNative.SCARD_S_SUCCESS;
+import static de.itemis.mosig.jassuan.jscdlib.JScdProblems.SCARD_E_NO_MEMORY;
+import static de.itemis.mosig.jassuan.jscdlib.JScdProblems.SCARD_S_SUCCESS;
 import static jdk.incubator.foreign.MemoryAddress.NULL;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
@@ -118,6 +119,19 @@ public class JScdHandleTest {
         inOrder.verify(nativeMock).sCardReleaseContext(eq(invocations.hContext));
     }
 
+    @Test
+    public void list_readers_throws_jscdException_if_establish_context_fails() {
+        establishContextReturns(SCARD_E_NO_MEMORY);
+        assertThatThrownBy(() -> underTest.listReaders()).as("Expected exception in case of an error in smart card native code.")
+            .isInstanceOf(JScdException.class)
+            .hasFieldOrPropertyWithValue("problem", SCARD_E_NO_MEMORY);
+    }
+
+    private void establishContextReturns(JScdProblem expectedValue) {
+        when(nativeMock.sCardEstablishContext(anyLong(), any(MemoryAddress.class), any(MemoryAddress.class), any(MemoryAddress.class)))
+            .thenReturn(expectedValue.errorCode());
+    }
+
     private void setupAllMethodsSuccess() {
         when(nativeMock.sCardEstablishContext(anyLong(), any(MemoryAddress.class), any(MemoryAddress.class), any(MemoryAddress.class)))
             .thenAnswer(invocation -> {
@@ -125,14 +139,14 @@ public class JScdHandleTest {
                         var ctx = new LongSegment()) {
                     ctxPtr.pointTo(ctx);
                     invocations.hContext = ctxPtr.getContainedAddress();
-                    return SCARD_S_SUCCESS;
+                    return SCARD_S_SUCCESS.errorCode();
                 }
             });
 
         when(nativeMock.sCardListReadersA(any(MemoryAddress.class), any(MemoryAddress.class), any(MemoryAddress.class), any(MemoryAddress.class)))
-            .thenReturn(SCARD_S_SUCCESS);
-        when(nativeMock.sCardFreeMemory(any(MemoryAddress.class), any(MemoryAddress.class))).thenReturn(SCARD_S_SUCCESS);
-        when(nativeMock.sCardReleaseContext(any(MemoryAddress.class))).thenReturn(SCARD_S_SUCCESS);
+            .thenReturn(SCARD_S_SUCCESS.errorCode());
+        when(nativeMock.sCardFreeMemory(any(MemoryAddress.class), any(MemoryAddress.class))).thenReturn(SCARD_S_SUCCESS.errorCode());
+        when(nativeMock.sCardReleaseContext(any(MemoryAddress.class))).thenReturn(SCARD_S_SUCCESS.errorCode());
     }
 
     private void setupAvailableReaders(String... readerNames) {
@@ -156,7 +170,7 @@ public class JScdHandleTest {
                     readerListLength.setValue(readerListMultiString.getBytes(StandardCharsets.UTF_8).length);
                     ptrToReaderList.pointTo(readerList);
                     invocations.readerListPtr = ptrToReaderList.getContainedAddress();
-                    return SCARD_S_SUCCESS;
+                    return SCARD_S_SUCCESS.errorCode();
                 }
             });
     }

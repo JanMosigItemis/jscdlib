@@ -63,12 +63,10 @@ public final class JScdHandle implements AutoCloseable {
 
     public List<String> listReaders() {
         List<String> result = new ArrayList<>();
-        LongPointerSegment ctxPtrSeg = null;
-        StringPointerSegment readerListPtrSeg = null;
+        LongPointerSegment ctxPtrSeg = new LongPointerSegment();
+        StringPointerSegment readerListPtrSeg = new StringPointerSegment();
         MemoryAddress ptrToFirstEntryInReaderList = null;
         try (var readerListLength = new IntSegment()) {
-            ctxPtrSeg = new LongPointerSegment();
-            readerListPtrSeg = new StringPointerSegment();
             readerListLength.setValue(SCARD_AUTOALLOCATE);
             nativeBridge.sCardEstablishContext(PCSC_SCOPE_SYSTEM, MemoryAddress.NULL, MemoryAddress.NULL, ctxPtrSeg.address());
             nativeBridge.sCardListReadersA(ctxPtrSeg.getContainedAddress(), SCARD_ALL_READERS, readerListPtrSeg.address(), readerListLength.address());

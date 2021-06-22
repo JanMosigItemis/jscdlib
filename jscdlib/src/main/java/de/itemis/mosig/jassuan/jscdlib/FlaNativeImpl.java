@@ -35,7 +35,7 @@ public class FlaNativeImpl implements JAssuanNative {
         var establishCtxMethodType = MethodType.methodType(long.class, long.class, MemoryAddress.class, MemoryAddress.class, MemoryAddress.class);
         var establishCtxMethod = linker.downcallHandle(establishCtxFunc, establishCtxMethodType, establishCtxFuncDescr);
 
-        long errorCode = SCARD_S_SUCCESS;
+        long errorCode = JScdProblems.SCARD_S_SUCCESS.errorCode();
         try {
             errorCode = (long) establishCtxMethod.invokeExact(dwScope, pvReserved1, pvReserved2, phContext);
         } catch (Throwable e) {
@@ -52,7 +52,7 @@ public class FlaNativeImpl implements JAssuanNative {
         var listReadersMethodType = MethodType.methodType(long.class, MemoryAddress.class, MemoryAddress.class, MemoryAddress.class, MemoryAddress.class);
         var listReadersMethod = linker.downcallHandle(listReadersFunc, listReadersMethodType, listReadersFuncDescr);
 
-        long errorCode = SCARD_S_SUCCESS;
+        long errorCode = JScdProblems.SCARD_S_SUCCESS.errorCode();
         try {
             errorCode = (long) listReadersMethod.invokeExact(hContext, mszGroups, mszReaders, pcchReaders);
         } catch (Throwable e) {
