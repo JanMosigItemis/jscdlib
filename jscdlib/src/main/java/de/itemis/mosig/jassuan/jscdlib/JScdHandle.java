@@ -13,6 +13,8 @@ import java.util.List;
 import de.itemis.mosig.jassuan.jscdlib.internal.IntSegment;
 import de.itemis.mosig.jassuan.jscdlib.internal.LongPointerSegment;
 import de.itemis.mosig.jassuan.jscdlib.internal.StringPointerSegment;
+import de.itemis.mosig.jassuan.jscdlib.problem.JScdException;
+import de.itemis.mosig.jassuan.jscdlib.problem.JScdProblems;
 import jdk.incubator.foreign.MemoryAddress;
 
 /**
@@ -68,8 +70,11 @@ public final class JScdHandle implements AutoCloseable {
         MemoryAddress ptrToFirstEntryInReaderList = null;
         try (var readerListLength = new IntSegment()) {
             readerListLength.setValue(SCARD_AUTOALLOCATE);
-            nativeBridge.sCardEstablishContext(PCSC_SCOPE_SYSTEM, MemoryAddress.NULL, MemoryAddress.NULL, ctxPtrSeg.address());
-            nativeBridge.sCardListReadersA(ctxPtrSeg.getContainedAddress(), SCARD_ALL_READERS, readerListPtrSeg.address(), readerListLength.address());
+
+            checkErrorCode(nativeBridge.sCardEstablishContext(PCSC_SCOPE_SYSTEM, MemoryAddress.NULL, MemoryAddress.NULL, ctxPtrSeg.address()));
+            checkErrorCode(
+                nativeBridge.sCardListReadersA(ctxPtrSeg.getContainedAddress(), SCARD_ALL_READERS, readerListPtrSeg.address(), readerListLength.address()));
+
             ptrToFirstEntryInReaderList = readerListPtrSeg.getContainedAddress();
             final int TRAILING_NULL = 1;
             var remainingLength = readerListLength.getValue() - TRAILING_NULL;
@@ -87,6 +92,12 @@ public final class JScdHandle implements AutoCloseable {
             ctxPtrSeg.close();
         }
         return Collections.unmodifiableList(result);
+    }
+
+    private void checkErrorCode(long errorCode) {
+        if (errorCode != JScdProblems.SCARD_S_SUCCESS.errorCode()) {
+            throw new JScdException(JScdProblems.fromError(errorCode));
+        }
     }
 
     @Override

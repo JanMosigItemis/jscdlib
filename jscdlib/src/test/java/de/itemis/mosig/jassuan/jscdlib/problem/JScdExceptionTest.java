@@ -1,7 +1,7 @@
-package de.itemis.mosig.jassuan.jscdlib;
+package de.itemis.mosig.jassuan.jscdlib.problem;
 
 import static de.itemis.mosig.fluffy.tests.java.FluffyTestHelper.assertSerialVersionUid;
-import static de.itemis.mosig.jassuan.jscdlib.JScdProblems.SCARD_F_UNKNOWN_ERROR;
+import static de.itemis.mosig.jassuan.jscdlib.problem.JScdProblems.SCARD_F_UNKNOWN_ERROR;
 import static java.lang.Long.toHexString;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -54,5 +54,15 @@ public class JScdExceptionTest {
     @Test
     public void constructor_does_not_accept_null_problem() {
         assertThatThrownBy(() -> new JScdException(null)).isInstanceOf(NullPointerException.class).hasMessage("problem");
+    }
+
+    @Test
+    public void two_args_constructor_appends_string_to_message() {
+        var expectedAppendix = "expectedAppendix";
+        var underTest = new JScdException(EXPECTED_PROBLEM, expectedAppendix);
+
+        assertThat(underTest.getMessage())
+            .isEqualTo(EXPECTED_PROBLEM.errorName() + "(0x" + toHexString(EXPECTED_PROBLEM.errorCode()).toUpperCase() + "): " + EXPECTED_PROBLEM.description()
+                + " - " + expectedAppendix);
     }
 }

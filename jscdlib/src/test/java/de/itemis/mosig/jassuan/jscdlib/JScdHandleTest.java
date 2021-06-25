@@ -3,8 +3,8 @@ package de.itemis.mosig.jassuan.jscdlib;
 import static de.itemis.mosig.jassuan.jscdlib.JAssuanNative.PCSC_SCOPE_SYSTEM;
 import static de.itemis.mosig.jassuan.jscdlib.JAssuanNative.SCARD_ALL_READERS;
 import static de.itemis.mosig.jassuan.jscdlib.JAssuanNative.SCARD_AUTOALLOCATE;
-import static de.itemis.mosig.jassuan.jscdlib.JScdProblems.SCARD_E_NO_MEMORY;
-import static de.itemis.mosig.jassuan.jscdlib.JScdProblems.SCARD_S_SUCCESS;
+import static de.itemis.mosig.jassuan.jscdlib.problem.JScdProblems.SCARD_E_NO_MEMORY;
+import static de.itemis.mosig.jassuan.jscdlib.problem.JScdProblems.SCARD_S_SUCCESS;
 import static jdk.incubator.foreign.MemoryAddress.NULL;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
@@ -33,6 +33,9 @@ import de.itemis.mosig.jassuan.jscdlib.internal.LongPointerSegment;
 import de.itemis.mosig.jassuan.jscdlib.internal.LongSegment;
 import de.itemis.mosig.jassuan.jscdlib.internal.StringPointerSegment;
 import de.itemis.mosig.jassuan.jscdlib.internal.StringSegment;
+import de.itemis.mosig.jassuan.jscdlib.problem.JScdException;
+import de.itemis.mosig.jassuan.jscdlib.problem.JScdProblem;
+import de.itemis.mosig.jassuan.jscdlib.problem.JScdProblems;
 import jdk.incubator.foreign.MemoryAddress;
 
 public class JScdHandleTest {
@@ -121,15 +124,55 @@ public class JScdHandleTest {
 
     @Test
     public void list_readers_throws_jscdException_if_establish_context_fails() {
-        establishContextReturns(SCARD_E_NO_MEMORY);
+        JScdProblems expectedProblem = SCARD_E_NO_MEMORY;
+        establishContextReturns(expectedProblem);
         assertThatThrownBy(() -> underTest.listReaders()).as("Expected exception in case of an error in smart card native code.")
             .isInstanceOf(JScdException.class)
-            .hasFieldOrPropertyWithValue("problem", SCARD_E_NO_MEMORY);
+            .hasFieldOrPropertyWithValue("problem", expectedProblem);
     }
 
-    private void establishContextReturns(JScdProblem expectedValue) {
+    @Test
+    public void list_readers_throws_jscdException_if_scardListReaders_fails() {
+        JScdProblems expectedProblem = SCARD_E_NO_MEMORY;
+        scardListReadersReturns(expectedProblem);
+        assertThatThrownBy(() -> underTest.listReaders()).as("Expected exception in case of an error in smart card native code.")
+            .isInstanceOf(JScdException.class)
+            .hasFieldOrPropertyWithValue("problem", expectedProblem);
+    }
+
+    @Test
+    public void list_readers_throws_jscdException_if_an_unknown_error_code_is_encountered() {
+        var errorWithUnknownErrorCode = new JScdProblem() {
+
+            @Override
+            public String errorName() {
+                return "testError";
+            }
+
+            @Override
+            public long errorCode() {
+                return -1;
+            }
+
+            @Override
+            public String description() {
+                return "Expected test error";
+            }
+        };
+        establishContextReturns(errorWithUnknownErrorCode);
+        assertThatThrownBy(() -> underTest.listReaders()).as("Expected exception in case smart card native code returns an unknown error code.")
+            .isInstanceOf(JScdException.class)
+            .hasFieldOrPropertyWithValue("problem", JScdProblems.UNKNOWN_ERROR_CODE);
+    }
+
+    private void establishContextReturns(JScdProblem expectedProblem) {
         when(nativeMock.sCardEstablishContext(anyLong(), any(MemoryAddress.class), any(MemoryAddress.class), any(MemoryAddress.class)))
-            .thenReturn(expectedValue.errorCode());
+            .thenReturn(expectedProblem.errorCode());
+    }
+
+    private void scardListReadersReturns(JScdProblem expectedProblem) {
+        when(nativeMock.sCardListReadersA(any(MemoryAddress.class), any(MemoryAddress.class), any(MemoryAddress.class), any(MemoryAddress.class)))
+            .thenReturn(expectedProblem.errorCode());
     }
 
     private void setupAllMethodsSuccess() {

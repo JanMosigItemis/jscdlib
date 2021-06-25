@@ -1,6 +1,6 @@
-package de.itemis.mosig.jassuan.jscdlib;
+package de.itemis.mosig.jassuan.jscdlib.problem;
 
-import static de.itemis.mosig.jassuan.jscdlib.JScdProblems.SCARD_F_UNKNOWN_ERROR;
+import static de.itemis.mosig.jassuan.jscdlib.problem.JScdProblems.SCARD_F_UNKNOWN_ERROR;
 import static java.lang.Long.toHexString;
 import static java.util.Objects.requireNonNull;
 
@@ -19,6 +19,12 @@ public final class JScdException extends RuntimeException {
     public JScdException(JScdProblem problem) {
         super(requireNonNull(problem, "problem").errorName() + "(0x" + toHexString(problem.errorCode()).toUpperCase() + "): "
             + problem.description());
+        this.problem = problem;
+    }
+
+    public JScdException(JScdProblem problem, String appendix) {
+        super(requireNonNull(problem, "problem").errorName() + "(0x" + toHexString(problem.errorCode()).toUpperCase() + "): "
+            + problem.description() + " - " + appendix);
         this.problem = problem;
     }
 

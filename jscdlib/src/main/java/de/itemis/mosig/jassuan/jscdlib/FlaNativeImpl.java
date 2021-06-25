@@ -5,6 +5,7 @@ import static jdk.incubator.foreign.CLinker.C_POINTER;
 
 import java.lang.invoke.MethodType;
 
+import de.itemis.mosig.jassuan.jscdlib.problem.JScdProblems;
 import jdk.incubator.foreign.CLinker;
 import jdk.incubator.foreign.FunctionDescriptor;
 import jdk.incubator.foreign.LibraryLookup;

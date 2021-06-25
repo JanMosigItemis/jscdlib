@@ -1,4 +1,4 @@
-package de.itemis.mosig.jassuan.jscdlib;
+package de.itemis.mosig.jassuan.jscdlib.problem;
 
 public interface JScdProblem {
 
