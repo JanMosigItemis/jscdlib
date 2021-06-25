@@ -91,4 +91,9 @@ public enum JScdProblems
             return problemCandidates.get(0);
         }
     }
+
+    @Override
+    public String toString() {
+        return this.errorName() + " (" + Long.toHexString(errorCode).toUpperCase() + ")";
+    }
 }

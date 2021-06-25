@@ -10,6 +10,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.itemis.mosig.jassuan.jscdlib.internal.IntSegment;
 import de.itemis.mosig.jassuan.jscdlib.internal.LongPointerSegment;
 import de.itemis.mosig.jassuan.jscdlib.internal.StringPointerSegment;
@@ -57,6 +60,8 @@ import jdk.incubator.foreign.MemoryAddress;
  */
 public final class JScdHandle implements AutoCloseable {
 
+    private static final Logger LOG = LoggerFactory.getLogger(JScdHandle.class);
+
     private final JAssuanNative nativeBridge;
 
     public JScdHandle(JAssuanNative nativeBridge) {
@@ -71,8 +76,8 @@ public final class JScdHandle implements AutoCloseable {
         try (var readerListLength = new IntSegment()) {
             readerListLength.setValue(SCARD_AUTOALLOCATE);
 
-            checkErrorCode(nativeBridge.sCardEstablishContext(PCSC_SCOPE_SYSTEM, MemoryAddress.NULL, MemoryAddress.NULL, ctxPtrSeg.address()));
-            checkErrorCode(
+            throwIfNoSuccess(nativeBridge.sCardEstablishContext(PCSC_SCOPE_SYSTEM, MemoryAddress.NULL, MemoryAddress.NULL, ctxPtrSeg.address()));
+            throwIfNoSuccess(
                 nativeBridge.sCardListReadersA(ctxPtrSeg.getContainedAddress(), SCARD_ALL_READERS, readerListPtrSeg.address(), readerListLength.address()));
 
             ptrToFirstEntryInReaderList = readerListPtrSeg.getContainedAddress();
@@ -86,17 +91,35 @@ public final class JScdHandle implements AutoCloseable {
                 remainingLength -= nextOffset;
             }
         } finally {
-            nativeBridge.sCardFreeMemory(ctxPtrSeg.getContainedAddress(), ptrToFirstEntryInReaderList);
-            readerListPtrSeg.close();
+            logIfNoSuccess(nativeBridge.sCardFreeMemory(ctxPtrSeg.getContainedAddress(), ptrToFirstEntryInReaderList),
+                "Possible ressource leak: Operation listReaders could not free memory.");
+            safeClose(readerListPtrSeg);
             nativeBridge.sCardReleaseContext(ctxPtrSeg.getContainedAddress());
             ctxPtrSeg.close();
         }
         return Collections.unmodifiableList(result);
     }
 
-    private void checkErrorCode(long errorCode) {
+    private void throwIfNoSuccess(long errorCode) {
         if (errorCode != JScdProblems.SCARD_S_SUCCESS.errorCode()) {
             throw new JScdException(JScdProblems.fromError(errorCode));
+        }
+    }
+
+    private void logIfNoSuccess(long errorCode, String errMsg) {
+        if (errorCode != JScdProblems.SCARD_S_SUCCESS.errorCode()) {
+            var problem = JScdProblems.fromError(errorCode);
+
+            LOG.warn(errMsg + " Reason: " + problem + ": " + problem.description());
+        }
+    }
+
+    private void safeClose(AutoCloseable closeable) {
+        try {
+            closeable.close();
+        } catch (Exception e) {
+            var msg = e.getMessage() == null ? "No further information." : e.getMessage();
+            LOG.warn("Possible ressource leak: Closing a ressource encountered a problem: " + e.getClass().getSimpleName() + ": " + msg);
         }
     }
 

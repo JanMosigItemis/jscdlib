@@ -1,5 +1,6 @@
 package de.itemis.mosig.jassuan.jscdlib;
 
+import static ch.qos.logback.classic.Level.WARN;
 import static de.itemis.mosig.jassuan.jscdlib.JAssuanNative.PCSC_SCOPE_SYSTEM;
 import static de.itemis.mosig.jassuan.jscdlib.JAssuanNative.SCARD_ALL_READERS;
 import static de.itemis.mosig.jassuan.jscdlib.JAssuanNative.SCARD_AUTOALLOCATE;
@@ -9,6 +10,7 @@ import static jdk.incubator.foreign.MemoryAddress.NULL;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
@@ -24,10 +26,12 @@ import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.itemis.mosig.fluffy.tests.java.FluffyTestHelper;
+import de.itemis.mosig.fluffy.tests.java.logging.FluffyTestAppender;
 import de.itemis.mosig.jassuan.jscdlib.internal.IntSegment;
 import de.itemis.mosig.jassuan.jscdlib.internal.LongPointerSegment;
 import de.itemis.mosig.jassuan.jscdlib.internal.LongSegment;
@@ -44,6 +48,9 @@ public class JScdHandleTest {
 
     private static final String READER_ONE = "readerOne";
     private static final String READER_TWO = "readerTwo";
+
+    @RegisterExtension
+    FluffyTestAppender logAssert = new FluffyTestAppender();
 
     private SCardMethodInvocations invocations;
     private JAssuanNative nativeMock;
@@ -165,6 +172,17 @@ public class JScdHandleTest {
             .hasFieldOrPropertyWithValue("problem", JScdProblems.UNKNOWN_ERROR_CODE);
     }
 
+    @Test
+    public void errors_during_free_mem_are_logged_no_exception_is_thrown() {
+        JScdProblems expectedProblem = SCARD_E_NO_MEMORY;
+        freeMemReturns(expectedProblem);
+
+        assertDoesNotThrow(() -> underTest.listReaders());
+
+        logAssert.assertLogContains(WARN,
+            "Possible ressource leak: Operation listReaders could not free memory. Reason: " + expectedProblem + ": " + expectedProblem.description());
+    }
+
     private void establishContextReturns(JScdProblem expectedProblem) {
         when(nativeMock.sCardEstablishContext(anyLong(), any(MemoryAddress.class), any(MemoryAddress.class), any(MemoryAddress.class)))
             .thenReturn(expectedProblem.errorCode());
@@ -173,6 +191,10 @@ public class JScdHandleTest {
     private void scardListReadersReturns(JScdProblem expectedProblem) {
         when(nativeMock.sCardListReadersA(any(MemoryAddress.class), any(MemoryAddress.class), any(MemoryAddress.class), any(MemoryAddress.class)))
             .thenReturn(expectedProblem.errorCode());
+    }
+
+    private void freeMemReturns(JScdProblem expectedProblem) {
+        when(nativeMock.sCardFreeMemory(any(MemoryAddress.class), any(MemoryAddress.class))).thenReturn(expectedProblem.errorCode());
     }
 
     private void setupAllMethodsSuccess() {
@@ -186,9 +208,8 @@ public class JScdHandleTest {
                 }
             });
 
-        when(nativeMock.sCardListReadersA(any(MemoryAddress.class), any(MemoryAddress.class), any(MemoryAddress.class), any(MemoryAddress.class)))
-            .thenReturn(SCARD_S_SUCCESS.errorCode());
-        when(nativeMock.sCardFreeMemory(any(MemoryAddress.class), any(MemoryAddress.class))).thenReturn(SCARD_S_SUCCESS.errorCode());
+        scardListReadersReturns(SCARD_S_SUCCESS);
+        freeMemReturns(SCARD_S_SUCCESS);
         when(nativeMock.sCardReleaseContext(any(MemoryAddress.class))).thenReturn(SCARD_S_SUCCESS.errorCode());
     }
 

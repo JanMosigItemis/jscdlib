@@ -49,6 +49,13 @@ public class JScdProblemsTest {
         assertThatThrownBy(() -> JScdProblems.fromError(unknownErrorCode)).isInstanceOf(JScdException.class).hasFieldOrPropertyWithValue("problem",
             JScdProblems.UNKNOWN_ERROR_CODE).hasMessageContaining("0x" + Long.toHexString(unknownErrorCode).toUpperCase());
     }
+
+    @EnumSource(JScdProblems.class)
+    @ParameterizedTest
+    public void test_toString(JScdProblems problem) {
+        assertThat(problem.toString()).as("toString: Encountered unexpected result.")
+            .isEqualTo(problem.errorName() + " (" + Long.toHexString(problem.errorCode()).toUpperCase() + ")");
+    }
 }
 
 

@@ -2,7 +2,6 @@ package de.itemis.mosig.jassuan.jscdlib.problem;
 
 import static de.itemis.mosig.fluffy.tests.java.FluffyTestHelper.assertSerialVersionUid;
 import static de.itemis.mosig.jassuan.jscdlib.problem.JScdProblems.SCARD_F_UNKNOWN_ERROR;
-import static java.lang.Long.toHexString;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -48,7 +47,7 @@ public class JScdExceptionTest {
         var underTest = new JScdException(EXPECTED_PROBLEM);
 
         assertThat(underTest.getMessage())
-            .isEqualTo(EXPECTED_PROBLEM.errorName() + "(0x" + toHexString(EXPECTED_PROBLEM.errorCode()).toUpperCase() + "): " + EXPECTED_PROBLEM.description());
+            .isEqualTo(EXPECTED_PROBLEM + ": " + EXPECTED_PROBLEM.description());
     }
 
     @Test
@@ -62,7 +61,6 @@ public class JScdExceptionTest {
         var underTest = new JScdException(EXPECTED_PROBLEM, expectedAppendix);
 
         assertThat(underTest.getMessage())
-            .isEqualTo(EXPECTED_PROBLEM.errorName() + "(0x" + toHexString(EXPECTED_PROBLEM.errorCode()).toUpperCase() + "): " + EXPECTED_PROBLEM.description()
-                + " - " + expectedAppendix);
+            .isEqualTo(EXPECTED_PROBLEM + ": " + EXPECTED_PROBLEM.description() + " - " + expectedAppendix);
     }
 }
