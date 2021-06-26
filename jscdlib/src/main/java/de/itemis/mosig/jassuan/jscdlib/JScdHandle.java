@@ -3,20 +3,25 @@ package de.itemis.mosig.jassuan.jscdlib;
 import static de.itemis.mosig.jassuan.jscdlib.JAssuanNative.PCSC_SCOPE_SYSTEM;
 import static de.itemis.mosig.jassuan.jscdlib.JAssuanNative.SCARD_ALL_READERS;
 import static de.itemis.mosig.jassuan.jscdlib.JAssuanNative.SCARD_AUTOALLOCATE;
+import static de.itemis.mosig.jassuan.jscdlib.problem.JScdProblems.SCARD_E_NO_READERS_AVAILABLE;
 import static java.util.Objects.requireNonNull;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.ImmutableSet;
 
 import de.itemis.mosig.jassuan.jscdlib.internal.IntSegment;
 import de.itemis.mosig.jassuan.jscdlib.internal.LongPointerSegment;
 import de.itemis.mosig.jassuan.jscdlib.internal.StringPointerSegment;
 import de.itemis.mosig.jassuan.jscdlib.problem.JScdException;
+import de.itemis.mosig.jassuan.jscdlib.problem.JScdProblem;
 import de.itemis.mosig.jassuan.jscdlib.problem.JScdProblems;
 import jdk.incubator.foreign.MemoryAddress;
 
@@ -61,6 +66,7 @@ import jdk.incubator.foreign.MemoryAddress;
 public final class JScdHandle implements AutoCloseable {
 
     private static final Logger LOG = LoggerFactory.getLogger(JScdHandle.class);
+    private static final Set<JScdProblem> NON_FATAL_PROBLEMS = ImmutableSet.of(JScdProblems.SCARD_S_SUCCESS, JScdProblems.SCARD_E_NO_READERS_AVAILABLE);
 
     private final JAssuanNative nativeBridge;
 
@@ -77,18 +83,20 @@ public final class JScdHandle implements AutoCloseable {
             readerListLength.setValue(SCARD_AUTOALLOCATE);
 
             throwIfNoSuccess(nativeBridge.sCardEstablishContext(PCSC_SCOPE_SYSTEM, MemoryAddress.NULL, MemoryAddress.NULL, ctxPtrSeg.address()));
-            throwIfNoSuccess(
+            var listReadersProblem = throwIfNoSuccess(
                 nativeBridge.sCardListReadersA(ctxPtrSeg.getContainedAddress(), SCARD_ALL_READERS, readerListPtrSeg.address(), readerListLength.address()));
 
-            ptrToFirstEntryInReaderList = readerListPtrSeg.getContainedAddress();
-            final int TRAILING_NULL = 1;
-            var remainingLength = readerListLength.getValue() - TRAILING_NULL;
-            while (remainingLength > 0) {
-                String currentReader = readerListPtrSeg.dereference();
-                result.add(currentReader);
-                var nextOffset = currentReader.getBytes(StandardCharsets.UTF_8).length + TRAILING_NULL;
-                readerListPtrSeg.pointTo(readerListPtrSeg.getContainedAddress().addOffset(nextOffset));
-                remainingLength -= nextOffset;
+            if (listReadersProblem != SCARD_E_NO_READERS_AVAILABLE) {
+                ptrToFirstEntryInReaderList = readerListPtrSeg.getContainedAddress();
+                final int TRAILING_NULL = 1;
+                var remainingLength = readerListLength.getValue() - TRAILING_NULL;
+                while (remainingLength > 0) {
+                    String currentReader = readerListPtrSeg.dereference();
+                    result.add(currentReader);
+                    var nextOffset = currentReader.getBytes(StandardCharsets.UTF_8).length + TRAILING_NULL;
+                    readerListPtrSeg.pointTo(readerListPtrSeg.getContainedAddress().addOffset(nextOffset));
+                    remainingLength -= nextOffset;
+                }
             }
         } finally {
             logIfNoSuccess(nativeBridge.sCardFreeMemory(ctxPtrSeg.getContainedAddress(), ptrToFirstEntryInReaderList),
@@ -100,10 +108,13 @@ public final class JScdHandle implements AutoCloseable {
         return Collections.unmodifiableList(result);
     }
 
-    private void throwIfNoSuccess(long errorCode) {
-        if (errorCode != JScdProblems.SCARD_S_SUCCESS.errorCode()) {
-            throw new JScdException(JScdProblems.fromError(errorCode));
+    private JScdProblem throwIfNoSuccess(long errorCode) {
+        var problem = JScdProblems.fromError(errorCode);
+        if (!NON_FATAL_PROBLEMS.contains(problem)) {
+            throw new JScdException(problem);
         }
+
+        return problem;
     }
 
     private void logIfNoSuccess(long errorCode, String errMsg) {

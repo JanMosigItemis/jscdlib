@@ -5,6 +5,7 @@ import static de.itemis.mosig.jassuan.jscdlib.JAssuanNative.PCSC_SCOPE_SYSTEM;
 import static de.itemis.mosig.jassuan.jscdlib.JAssuanNative.SCARD_ALL_READERS;
 import static de.itemis.mosig.jassuan.jscdlib.JAssuanNative.SCARD_AUTOALLOCATE;
 import static de.itemis.mosig.jassuan.jscdlib.problem.JScdProblems.SCARD_E_NO_MEMORY;
+import static de.itemis.mosig.jassuan.jscdlib.problem.JScdProblems.SCARD_E_NO_READERS_AVAILABLE;
 import static de.itemis.mosig.jassuan.jscdlib.problem.JScdProblems.SCARD_S_SUCCESS;
 import static jdk.incubator.foreign.MemoryAddress.NULL;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -109,6 +110,12 @@ public class JScdHandleTest {
     public void when_multiple_readers_are_available_return_their_names_as_list() {
         setupAvailableReaders(READER_ONE, READER_TWO);
         assertThat(underTest.listReaders()).containsExactly(READER_ONE, READER_TWO);
+    }
+
+    @Test
+    public void when_no_readers_are_available_return_empty_list() {
+        scardListReadersReturns(SCARD_E_NO_READERS_AVAILABLE);
+        assertThat(underTest.listReaders()).isEmpty();
     }
 
     /**
