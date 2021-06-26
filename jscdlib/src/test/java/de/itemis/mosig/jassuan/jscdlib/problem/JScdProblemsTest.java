@@ -37,7 +37,6 @@ public class JScdProblemsTest {
         JScdProblems[] knownProblems = JScdProblems.values();
         for (JScdProblems problem : knownProblems) {
             errorCodes.add(problem.errorCode());
-            System.out.println(problem + " " + Long.toHexString(problem.errorCode()));
         }
 
         assertThat(errorCodes.size()).as("At least one problem error code is a duplicate.").isEqualTo(knownProblems.length);
@@ -54,7 +53,7 @@ public class JScdProblemsTest {
     @ParameterizedTest
     public void test_toString(JScdProblems problem) {
         assertThat(problem.toString()).as("toString: Encountered unexpected result.")
-            .isEqualTo(problem.errorName() + " (" + Long.toHexString(problem.errorCode()).toUpperCase() + ")");
+            .isEqualTo(problem.errorName() + " (0x" + Long.toHexString(problem.errorCode()).toUpperCase() + ")");
     }
 }
 

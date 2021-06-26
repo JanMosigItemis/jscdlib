@@ -26,35 +26,35 @@ public enum JScdProblems
      * 0x0 - Success
      */
     SCARD_S_SUCCESS(
-            0x0,
+            0x0L,
             "Success"),
 
     /**
      * 0x8010002E - Group contains no readers
      */
     SCARD_E_NO_READERS_AVAILABLE(
-            0x8010002E,
+            0x8010002EL,
             "Group contains no readers"),
 
     /**
      * 0x80100017 - Specified reader is not currently available for use
      */
     SCARD_E_READER_UNAVAILABLE(
-            0x80100017,
+            0x80100017L,
             "Specified reader is not currently available for use"),
 
     /**
      * 0x80100006 - Not enough memory available to complete this command.
      */
     SCARD_E_NO_MEMORY(
-            0x80100006,
+            0x80100006L,
             "Not enough memory available to complete this command."),
 
     /**
      * 0x80100014 - An internal error has been detected, but the source is unknown.
      */
     SCARD_F_UNKNOWN_ERROR(
-            0x80100014,
+            0x80100014L,
             "An internal error has been detected, but the source is unknown.");
 
     private final long errorCode;
@@ -81,7 +81,9 @@ public enum JScdProblems
     }
 
     public static JScdProblem fromError(long errorCode) {
-        var problemCandidates = Arrays.stream(JScdProblems.values()).filter(problem -> problem.errorCode == errorCode).toList();
+        var problemCandidates = Arrays.stream(JScdProblems.values()).filter(problem -> {
+            return problem.errorCode == errorCode;
+        }).toList();
 
         if (problemCandidates.isEmpty()) {
             throw new JScdException(UNKNOWN_ERROR_CODE, "0x" + Long.toHexString(errorCode).toUpperCase());
@@ -94,6 +96,6 @@ public enum JScdProblems
 
     @Override
     public String toString() {
-        return this.errorName() + " (" + Long.toHexString(errorCode).toUpperCase() + ")";
+        return this.errorName() + " (0x" + Long.toHexString(errorCode).toUpperCase() + ")";
     }
 }
