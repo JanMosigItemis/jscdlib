@@ -1,7 +1,8 @@
 package de.itemis.mosig.jassuan.jscdlib.problem;
 
 import static de.itemis.mosig.fluffy.tests.java.FluffyTestHelper.assertSerialVersionUid;
-import static de.itemis.mosig.jassuan.jscdlib.problem.JScdProblems.SCARD_F_UNKNOWN_ERROR;
+import static de.itemis.mosig.fluffy.tests.java.exceptions.ExpectedExceptions.EXPECTED_CHECKED_EXCEPTION;
+import static de.itemis.mosig.jassuan.jscdlib.problem.JScdProblems.SCARD_F_INTERNAL_ERROR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -29,7 +30,7 @@ public class JScdExceptionTest {
 
     @Test
     public void no_args_constructor_sets_problem_to_unknown() {
-        assertThat(new JScdException().problem()).as("Default problem must be unknown error").isEqualTo(SCARD_F_UNKNOWN_ERROR);
+        assertThat(new JScdException().problem()).as("Default problem must be unknown error").isEqualTo(SCARD_F_INTERNAL_ERROR);
     }
 
     @Test
@@ -52,7 +53,7 @@ public class JScdExceptionTest {
 
     @Test
     public void constructor_does_not_accept_null_problem() {
-        assertThatThrownBy(() -> new JScdException(null)).isInstanceOf(NullPointerException.class).hasMessage("problem");
+        assertThatThrownBy(() -> new JScdException((JScdProblem) null)).isInstanceOf(NullPointerException.class).hasMessage("problem");
     }
 
     @Test
@@ -62,5 +63,28 @@ public class JScdExceptionTest {
 
         assertThat(underTest.getMessage())
             .isEqualTo(EXPECTED_PROBLEM + ": " + EXPECTED_PROBLEM.description() + " - " + expectedAppendix);
+    }
+
+    @Test
+    public void constructor_sets_cause() {
+        var underTest = new JScdException(EXPECTED_CHECKED_EXCEPTION);
+        assertThat(underTest.getCause()).isSameAs(EXPECTED_CHECKED_EXCEPTION);
+    }
+
+    @Test
+    public void constructor_does_not_accept_null_cause() {
+        assertThatThrownBy(() -> new JScdException((Throwable) null)).isInstanceOf(NullPointerException.class).hasMessage("cause");
+    }
+
+    @Test
+    public void constructor_sets_cause_message_correctly() {
+        var underTest = new JScdException(EXPECTED_CHECKED_EXCEPTION);
+        assertThat(underTest.getMessage()).isEqualTo(SCARD_F_INTERNAL_ERROR + ": " + SCARD_F_INTERNAL_ERROR.description() + " - "
+            + EXPECTED_CHECKED_EXCEPTION.getClass().getSimpleName() + ": " + EXPECTED_CHECKED_EXCEPTION.getMessage());
+
+        NullPointerException npe = new NullPointerException();
+        underTest = new JScdException(npe);
+        assertThat(underTest.getMessage()).isEqualTo(SCARD_F_INTERNAL_ERROR + ": " + SCARD_F_INTERNAL_ERROR.description() + " - "
+            + npe.getClass().getSimpleName() + ": No further information");
     }
 }

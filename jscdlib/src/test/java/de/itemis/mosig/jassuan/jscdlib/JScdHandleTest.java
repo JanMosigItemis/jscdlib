@@ -15,9 +15,12 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.nio.charset.StandardCharsets;
@@ -114,8 +117,33 @@ public class JScdHandleTest {
 
     @Test
     public void when_no_readers_are_available_return_empty_list() {
-        scardListReadersReturns(SCARD_E_NO_READERS_AVAILABLE);
+        setupAvailableReaders(SCARD_E_NO_READERS_AVAILABLE);
         assertThat(underTest.listReaders()).isEmpty();
+    }
+
+    @Test
+    public void when_no_readers_are_available_cleanup_correctly() {
+        setupAvailableReaders(SCARD_E_NO_READERS_AVAILABLE);
+        underTest.listReaders();
+        assertThat(invocations.readerListPtr).describedAs("The readerListPtr must be set even if listReaders returns no readers.").isNotNull();
+        verify(nativeMock).sCardFreeMemory(invocations.hContext, invocations.readerListPtr);
+        verify(nativeMock).sCardReleaseContext(invocations.hContext);
+    }
+
+    @Test
+    public void when_establish_ctx_fails_skip_cleanup() {
+        establishContextReturns(SCARD_E_NO_MEMORY);
+        assertThatThrownBy(() -> underTest.listReaders()).isInstanceOf(JScdException.class);
+        verify(nativeMock, never()).sCardFreeMemory(nullable(MemoryAddress.class), nullable(MemoryAddress.class));
+        verify(nativeMock, never()).sCardReleaseContext(nullable(MemoryAddress.class));
+    }
+
+    @Test
+    public void when_establish_listReaders_fails_skip_freeMem() {
+        setupAvailableReaders(SCARD_E_NO_MEMORY);
+        assertThatThrownBy(() -> underTest.listReaders()).isInstanceOf(JScdException.class);
+        verify(nativeMock, never()).sCardFreeMemory(nullable(MemoryAddress.class), nullable(MemoryAddress.class));
+        verify(nativeMock).sCardReleaseContext(any(MemoryAddress.class));
     }
 
     /**
@@ -148,7 +176,7 @@ public class JScdHandleTest {
     @Test
     public void list_readers_throws_jscdException_if_scardListReaders_fails() {
         JScdProblems expectedProblem = SCARD_E_NO_MEMORY;
-        scardListReadersReturns(expectedProblem);
+        setupAvailableReaders(expectedProblem);
         assertThatThrownBy(() -> underTest.listReaders()).as("Expected exception in case of an error in smart card native code.")
             .isInstanceOf(JScdException.class)
             .hasFieldOrPropertyWithValue("problem", expectedProblem);
@@ -190,18 +218,29 @@ public class JScdHandleTest {
             "Possible ressource leak: Operation listReaders could not free memory. Reason: " + expectedProblem + ": " + expectedProblem.description());
     }
 
+    @Test
+    public void errors_during_release_ctx_are_logged_no_exception_is_thrown() {
+        JScdProblems expectedProblem = SCARD_E_NO_MEMORY;
+        releaseCtxReturns(expectedProblem);
+
+        assertDoesNotThrow(() -> underTest.listReaders());
+
+        logAssert.assertLogContains(WARN,
+            "Possible ressource leak: Operation listReaders could not release scard context. Reason: " + expectedProblem + ": "
+                + expectedProblem.description());
+    }
+
     private void establishContextReturns(JScdProblem expectedProblem) {
         when(nativeMock.sCardEstablishContext(anyLong(), any(MemoryAddress.class), any(MemoryAddress.class), any(MemoryAddress.class)))
             .thenReturn(expectedProblem.errorCode());
     }
 
-    private void scardListReadersReturns(JScdProblem expectedProblem) {
-        when(nativeMock.sCardListReadersA(any(MemoryAddress.class), any(MemoryAddress.class), any(MemoryAddress.class), any(MemoryAddress.class)))
-            .thenReturn(expectedProblem.errorCode());
-    }
-
     private void freeMemReturns(JScdProblem expectedProblem) {
         when(nativeMock.sCardFreeMemory(any(MemoryAddress.class), any(MemoryAddress.class))).thenReturn(expectedProblem.errorCode());
+    }
+
+    private void releaseCtxReturns(JScdProblem expectedProblem) {
+        when(nativeMock.sCardReleaseContext(any(MemoryAddress.class))).thenReturn(expectedProblem.errorCode());
     }
 
     private void setupAllMethodsSuccess() {
@@ -215,12 +254,12 @@ public class JScdHandleTest {
                 }
             });
 
-        scardListReadersReturns(SCARD_S_SUCCESS);
+        setupAvailableReaders(SCARD_S_SUCCESS);
         freeMemReturns(SCARD_S_SUCCESS);
-        when(nativeMock.sCardReleaseContext(any(MemoryAddress.class))).thenReturn(SCARD_S_SUCCESS.errorCode());
+        releaseCtxReturns(SCARD_S_SUCCESS);
     }
 
-    private void setupAvailableReaders(String... readerNames) {
+    private void setupAvailableReaders(JScdProblem expectedProblem, String... readerNames) {
         when(nativeMock.sCardListReadersA(any(MemoryAddress.class), any(MemoryAddress.class), any(MemoryAddress.class),
             any(MemoryAddress.class))).then(invocation -> {
                 var addrOfReaderListPtr = invocation.getArgument(2, MemoryAddress.class);
@@ -241,9 +280,13 @@ public class JScdHandleTest {
                     readerListLength.setValue(readerListMultiString.getBytes(StandardCharsets.UTF_8).length);
                     ptrToReaderList.pointTo(readerList);
                     invocations.readerListPtr = ptrToReaderList.getContainedAddress();
-                    return SCARD_S_SUCCESS.errorCode();
+                    return expectedProblem.errorCode();
                 }
             });
+    }
+
+    private void setupAvailableReaders(String... readerNames) {
+        setupAvailableReaders(SCARD_S_SUCCESS, readerNames);
     }
 
     private static final class SCardMethodInvocations {

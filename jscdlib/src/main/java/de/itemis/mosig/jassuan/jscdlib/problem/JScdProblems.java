@@ -51,11 +51,11 @@ public enum JScdProblems
             "Not enough memory available to complete this command."),
 
     /**
-     * 0x80100014 - An internal error has been detected, but the source is unknown.
+     * 0x80100014 - An internal error has been detected.
      */
-    SCARD_F_UNKNOWN_ERROR(
+    SCARD_F_INTERNAL_ERROR(
             0x80100014L,
-            "An internal error has been detected, but the source is unknown.");
+            "An internal error has been detected.");
 
     private final long errorCode;
     private final String description;

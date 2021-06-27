@@ -56,5 +56,3 @@ public class JScdProblemsTest {
             .isEqualTo(problem.errorName() + " (0x" + Long.toHexString(problem.errorCode()).toUpperCase() + ")");
     }
 }
-
-

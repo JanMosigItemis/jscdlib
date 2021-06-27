@@ -79,15 +79,20 @@ public final class JScdHandle implements AutoCloseable {
         LongPointerSegment ctxPtrSeg = new LongPointerSegment();
         StringPointerSegment readerListPtrSeg = new StringPointerSegment();
         MemoryAddress ptrToFirstEntryInReaderList = null;
+        boolean ctxEstablished = false;
+        boolean listReadersReturned = false;
+
         try (var readerListLength = new IntSegment()) {
             readerListLength.setValue(SCARD_AUTOALLOCATE);
 
             throwIfNoSuccess(nativeBridge.sCardEstablishContext(PCSC_SCOPE_SYSTEM, MemoryAddress.NULL, MemoryAddress.NULL, ctxPtrSeg.address()));
+            ctxEstablished = true;
+
             var listReadersProblem = throwIfNoSuccess(
                 nativeBridge.sCardListReadersA(ctxPtrSeg.getContainedAddress(), SCARD_ALL_READERS, readerListPtrSeg.address(), readerListLength.address()));
-
+            listReadersReturned = true;
+            ptrToFirstEntryInReaderList = readerListPtrSeg.getContainedAddress();
             if (listReadersProblem != SCARD_E_NO_READERS_AVAILABLE) {
-                ptrToFirstEntryInReaderList = readerListPtrSeg.getContainedAddress();
                 final int TRAILING_NULL = 1;
                 var remainingLength = readerListLength.getValue() - TRAILING_NULL;
                 while (remainingLength > 0) {
@@ -99,11 +104,16 @@ public final class JScdHandle implements AutoCloseable {
                 }
             }
         } finally {
-            logIfNoSuccess(nativeBridge.sCardFreeMemory(ctxPtrSeg.getContainedAddress(), ptrToFirstEntryInReaderList),
-                "Possible ressource leak: Operation listReaders could not free memory.");
+            if (ctxEstablished) {
+                if (listReadersReturned) {
+                    logIfNoSuccess(nativeBridge.sCardFreeMemory(ctxPtrSeg.getContainedAddress(), ptrToFirstEntryInReaderList),
+                        "Possible ressource leak: Operation listReaders could not free memory.");
+                }
+                logIfNoSuccess(nativeBridge.sCardReleaseContext(ctxPtrSeg.getContainedAddress()),
+                    "Possible ressource leak: Operation listReaders could not release scard context.");
+            }
             safeClose(readerListPtrSeg);
-            nativeBridge.sCardReleaseContext(ctxPtrSeg.getContainedAddress());
-            ctxPtrSeg.close();
+            safeClose(ctxPtrSeg);
         }
         return Collections.unmodifiableList(result);
     }
