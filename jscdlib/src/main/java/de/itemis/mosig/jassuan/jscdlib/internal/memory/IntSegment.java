@@ -1,4 +1,4 @@
-package de.itemis.mosig.jassuan.jscdlib.internal;
+package de.itemis.mosig.jassuan.jscdlib.internal.memory;
 
 import static java.util.Objects.requireNonNull;
 
@@ -8,11 +8,11 @@ import jdk.incubator.foreign.MemorySegment;
 
 public class IntSegment extends MemorySegmentDelegate implements ValueSegment<Integer> {
 
-    private static final int INITIAL_VALUE = 0;
+    private static final int DEFAULT_VALUE = -1;
 
     public IntSegment() {
         super(MemorySegment.allocateNative(MemoryLayouts.JAVA_INT));
-        setValue(INITIAL_VALUE);
+        setValue(DEFAULT_VALUE);
     }
 
     public IntSegment(MemoryAddress addr) {
@@ -21,6 +21,11 @@ public class IntSegment extends MemorySegmentDelegate implements ValueSegment<In
 
     public IntSegment(MemorySegment segment) {
         super(segment);
+    }
+
+    public IntSegment(int initialValue) {
+        this();
+        setValue(initialValue);
     }
 
     @Override

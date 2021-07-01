@@ -1,5 +1,6 @@
-package de.itemis.mosig.jassuan.jscdlib.internal;
+package de.itemis.mosig.jassuan.jscdlib.internal.memory;
 
+import static de.itemis.mosig.fluffy.tests.java.FluffyTestHelper.assertNullArgNotAccepted;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -75,5 +76,17 @@ public class StringSegmentTest {
         var newValue = "newValue";
         underTest.setValue(oldValue);
         assertThat(underTest.setValue(newValue)).isEqualTo(oldValue);
+    }
+
+    @Test
+    public void constructor_accepts_initial_value() {
+        var expectedVal = "expectedVal";
+        underTest = new StringSegment(expectedVal);
+        assertThat(underTest.getValue()).isEqualTo(expectedVal);
+    }
+
+    @Test
+    public void constructor_does_not_accept_null_str() {
+        assertNullArgNotAccepted(arg -> new StringSegment((String) null), "initialValue");
     }
 }

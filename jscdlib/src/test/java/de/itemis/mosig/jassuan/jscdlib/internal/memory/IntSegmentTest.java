@@ -1,4 +1,4 @@
-package de.itemis.mosig.jassuan.jscdlib.internal;
+package de.itemis.mosig.jassuan.jscdlib.internal.memory;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -9,15 +9,15 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class LongSegmentTest {
+public class IntSegmentTest {
 
-    private static final Logger LOG = LoggerFactory.getLogger(LongSegmentTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(IntSegmentTest.class);
 
-    private LongSegment underTest;
+    private IntSegment underTest;
 
     @BeforeEach
     public void setUp() {
-        underTest = new LongSegment();
+        underTest = new IntSegment();
     }
 
     @AfterEach
@@ -32,26 +32,26 @@ public class LongSegmentTest {
     }
 
     @Test
-    public void initial_value_is_zero() {
-        try (var cut = new LongSegment()) {
-            assertThat(cut.getValue()).isEqualTo(0L);
+    public void initial_value_is_minus_one() {
+        try (var cut = new IntSegment()) {
+            assertThat(cut.getValue()).isEqualTo(-1L);
         }
     }
 
     @Test
     public void wrap_wraps_provided_segment() {
-        var expectedVal = 123L;
+        var expectedVal = 123;
         underTest.setValue(expectedVal);
-        try (var wrappingSeg = new LongSegment(underTest)) {
+        try (var wrappingSeg = new IntSegment(underTest)) {
             assertThat(wrappingSeg.getSegment()).isSameAs(underTest);
         }
     }
 
     @Test
     public void wrap_wraps_provided_addr() {
-        var expectedVal = 123L;
+        var expectedVal = 123;
         underTest.setValue(expectedVal);
-        try (var wrappingSeg = new LongSegment(underTest.address())) {
+        try (var wrappingSeg = new IntSegment(underTest.address())) {
             assertThat(wrappingSeg.getValue()).isEqualTo(expectedVal);
             assertThat(wrappingSeg.address()).isEqualTo(underTest.address());
         }
@@ -59,11 +59,11 @@ public class LongSegmentTest {
 
     @Test
     public void getValue_getsValue_setValue_setsValue() {
-        var expectedVal = Long.MAX_VALUE;
+        var expectedVal = Integer.MAX_VALUE;
         underTest.setValue(expectedVal);
         assertThat(underTest.getValue()).isEqualTo(expectedVal);
 
-        expectedVal = Long.MIN_VALUE;
+        expectedVal = Integer.MIN_VALUE;
         underTest.setValue(expectedVal);
         assertThat(underTest.getValue()).isEqualTo(expectedVal);
     }
@@ -75,9 +75,16 @@ public class LongSegmentTest {
 
     @Test
     public void setValue_returns_old_value() {
-        var oldValue = 123L;
-        var newValue = 321L;
+        var oldValue = 123;
+        var newValue = 321;
         underTest.setValue(oldValue);
         assertThat(underTest.setValue(newValue)).isEqualTo(oldValue);
+    }
+
+    @Test
+    public void constructor_accepts_initial_value() {
+        var expectedVal = 123;
+        underTest = new IntSegment(expectedVal);
+        assertThat(underTest.getValue()).isEqualTo(expectedVal);
     }
 }

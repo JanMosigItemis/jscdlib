@@ -1,11 +1,11 @@
-package de.itemis.mosig.jassuan.jscdlib.internal;
+package de.itemis.mosig.jassuan.jscdlib.internal.memory;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.nio.charset.StandardCharsets;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-
-import java.nio.charset.StandardCharsets;
 
 import jdk.incubator.foreign.CLinker;
 import jdk.incubator.foreign.MemoryAddress;
@@ -36,7 +36,7 @@ public class StringPointerSegmentTest {
     @Test
     public void no_arg_constructor_creates_new_seg_containing_zero() {
         underTest = new StringPointerSegment();
-        assertThat(underTest.getValue()).isEqualTo(0L);
+        assertThat(underTest.getValue()).isEqualTo(-1L);
     }
 
     @Test

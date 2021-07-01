@@ -1,9 +1,9 @@
 package de.itemis.mosig.jassuan.jscdlib;
 
 import static ch.qos.logback.classic.Level.WARN;
-import static de.itemis.mosig.jassuan.jscdlib.JAssuanNative.PCSC_SCOPE_SYSTEM;
-import static de.itemis.mosig.jassuan.jscdlib.JAssuanNative.SCARD_ALL_READERS;
-import static de.itemis.mosig.jassuan.jscdlib.JAssuanNative.SCARD_AUTOALLOCATE;
+import static de.itemis.mosig.jassuan.jscdlib.JScardNative.PCSC_SCOPE_SYSTEM;
+import static de.itemis.mosig.jassuan.jscdlib.JScardNative.SCARD_ALL_READERS;
+import static de.itemis.mosig.jassuan.jscdlib.JScardNative.SCARD_AUTOALLOCATE;
 import static de.itemis.mosig.jassuan.jscdlib.problem.JScdProblems.SCARD_E_NO_MEMORY;
 import static de.itemis.mosig.jassuan.jscdlib.problem.JScdProblems.SCARD_E_NO_READERS_AVAILABLE;
 import static de.itemis.mosig.jassuan.jscdlib.problem.JScdProblems.SCARD_S_SUCCESS;
@@ -36,11 +36,11 @@ import org.slf4j.LoggerFactory;
 
 import de.itemis.mosig.fluffy.tests.java.FluffyTestHelper;
 import de.itemis.mosig.fluffy.tests.java.logging.FluffyTestAppender;
-import de.itemis.mosig.jassuan.jscdlib.internal.IntSegment;
-import de.itemis.mosig.jassuan.jscdlib.internal.LongPointerSegment;
-import de.itemis.mosig.jassuan.jscdlib.internal.LongSegment;
-import de.itemis.mosig.jassuan.jscdlib.internal.StringPointerSegment;
-import de.itemis.mosig.jassuan.jscdlib.internal.StringSegment;
+import de.itemis.mosig.jassuan.jscdlib.internal.memory.IntSegment;
+import de.itemis.mosig.jassuan.jscdlib.internal.memory.LongPointerSegment;
+import de.itemis.mosig.jassuan.jscdlib.internal.memory.LongSegment;
+import de.itemis.mosig.jassuan.jscdlib.internal.memory.StringPointerSegment;
+import de.itemis.mosig.jassuan.jscdlib.internal.memory.StringSegment;
 import de.itemis.mosig.jassuan.jscdlib.problem.JScdException;
 import de.itemis.mosig.jassuan.jscdlib.problem.JScdProblem;
 import de.itemis.mosig.jassuan.jscdlib.problem.JScdProblems;
@@ -57,16 +57,16 @@ public class JScdHandleTest {
     FluffyTestAppender logAssert = new FluffyTestAppender();
 
     private SCardMethodInvocations invocations;
-    private JAssuanNative nativeMock;
-    private JScdHandle underTest;
+    private JScardNative nativeMock;
+    private JSCardHandle underTest;
 
     @BeforeEach
     public void setUp() {
-        nativeMock = mock(JAssuanNative.class);
+        nativeMock = mock(JScardNative.class);
         invocations = new SCardMethodInvocations();
         setupAllMethodsSuccess();
 
-        underTest = JScdLib.createHandle(nativeMock);
+        underTest = new JSCardHandle(nativeMock);
     }
 
     @AfterEach
@@ -82,12 +82,12 @@ public class JScdHandleTest {
 
     @Test
     public void test_handle_is_final() {
-        FluffyTestHelper.assertFinal(JScdHandle.class);
+        FluffyTestHelper.assertFinal(JSCardHandle.class);
     }
 
     @Test
     public void test_handle_is_autoclosable() {
-        assertThat(AutoCloseable.class).as("JScd handles must be autoclossable").isAssignableFrom(JScdHandle.class);
+        assertThat(AutoCloseable.class).as("JScd handles must be autoclossable").isAssignableFrom(JSCardHandle.class);
     }
 
     @Test

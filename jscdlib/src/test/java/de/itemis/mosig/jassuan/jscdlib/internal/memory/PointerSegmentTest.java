@@ -1,4 +1,4 @@
-package de.itemis.mosig.jassuan.jscdlib.internal;
+package de.itemis.mosig.jassuan.jscdlib.internal.memory;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -45,7 +45,7 @@ public class PointerSegmentTest {
     @Test
     public void no_arg_constructor_creates_new_seg_containing_zero() {
         underTest = constructSeg();
-        assertThat(underTest.getValue()).isEqualTo(0L);
+        assertThat(underTest.getValue()).isEqualTo(-1L);
     }
 
     @Test

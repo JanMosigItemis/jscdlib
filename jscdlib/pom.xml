@@ -81,7 +81,8 @@
         <awaitility.version>4.1.0</awaitility.version>
         <arch.unit.version>0.19.0</arch.unit.version>
         <fluffy.tests.version>1.0.0-SNAPSHOT</fluffy.tests.version>
-        <custom.jvm.options>-Dforeign.restricted=permit --add-modules=jdk.incubator.foreign</custom.jvm.options>
+        <custom.jvm.options>-Dforeign.restricted=permit
+            --add-modules=jdk.incubator.foreign</custom.jvm.options>
     </properties>
 
     <dependencyManagement>

@@ -16,7 +16,7 @@
     <!-- Set JETTY logging to level INFO -->
     <logger name="org.eclipse" level="INFO" />
 
-    <root level="info">
+    <root level="debug">
         <appender-ref ref="STDOUT" />
     </root>
 </configuration>

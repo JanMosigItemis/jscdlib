@@ -1,4 +1,4 @@
-package de.itemis.mosig.jassuan.jscdlib.internal;
+package de.itemis.mosig.jassuan.jscdlib.internal.memory;
 
 import java.nio.charset.StandardCharsets;
 

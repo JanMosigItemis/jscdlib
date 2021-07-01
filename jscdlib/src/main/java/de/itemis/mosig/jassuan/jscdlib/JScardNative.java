@@ -3,10 +3,10 @@ package de.itemis.mosig.jassuan.jscdlib;
 import jdk.incubator.foreign.MemoryAddress;
 
 /**
- * Implementations of this interface know how to call the native assuan lib functions. It abstracts
- * away the knowledge how exactly this is done (e. g. JNI, JNA, FLA).
+ * Implementations of this interface know how to call native smart card functions via OS libraries.
+ * It abstracts away the knowledge how exactly this is done (e. g. JNI, JNA, FLA).
  */
-public interface JAssuanNative {
+public interface JScardNative {
 
     /**
      * According to the spec, this is a null pointer.

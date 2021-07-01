@@ -1,4 +1,4 @@
-package de.itemis.mosig.jassuan.jscdlib.internal;
+package de.itemis.mosig.jassuan.jscdlib.internal.memory;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Objects.requireNonNull;
@@ -15,12 +15,16 @@ public class StringSegment extends MemorySegmentDelegate implements ValueSegment
         super(CLinker.toCString(INITIAL_VALUE, UTF_8));
     }
 
-    public StringSegment(MemoryAddress addr) {
-        super(addr, CLinker.toJavaStringRestricted(addr).getBytes(UTF_8).length + 1);
+    public StringSegment(MemoryAddress addrOfInitialValueSeg) {
+        super(addrOfInitialValueSeg, CLinker.toJavaStringRestricted(addrOfInitialValueSeg).getBytes(UTF_8).length + 1);
     }
 
-    public StringSegment(MemorySegment segment) {
-        super(segment);
+    public StringSegment(MemorySegment initialValueSeg) {
+        super(initialValueSeg);
+    }
+
+    public StringSegment(String initialValue) {
+        super(CLinker.toCString(requireNonNull(initialValue, "initialValue"), UTF_8));
     }
 
     @Override

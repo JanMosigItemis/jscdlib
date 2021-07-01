@@ -1,4 +1,4 @@
-package de.itemis.mosig.jassuan.jscdlib.internal;
+package de.itemis.mosig.jassuan.jscdlib.internal.memory;
 
 import static jdk.incubator.foreign.MemoryAddress.ofLong;
 import static org.assertj.core.api.Assertions.assertThat;

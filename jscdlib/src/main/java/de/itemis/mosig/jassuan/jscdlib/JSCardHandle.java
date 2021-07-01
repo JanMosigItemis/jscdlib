@@ -1,8 +1,8 @@
 package de.itemis.mosig.jassuan.jscdlib;
 
-import static de.itemis.mosig.jassuan.jscdlib.JAssuanNative.PCSC_SCOPE_SYSTEM;
-import static de.itemis.mosig.jassuan.jscdlib.JAssuanNative.SCARD_ALL_READERS;
-import static de.itemis.mosig.jassuan.jscdlib.JAssuanNative.SCARD_AUTOALLOCATE;
+import static de.itemis.mosig.jassuan.jscdlib.JScardNative.PCSC_SCOPE_SYSTEM;
+import static de.itemis.mosig.jassuan.jscdlib.JScardNative.SCARD_ALL_READERS;
+import static de.itemis.mosig.jassuan.jscdlib.JScardNative.SCARD_AUTOALLOCATE;
 import static de.itemis.mosig.jassuan.jscdlib.problem.JScdProblems.SCARD_E_NO_READERS_AVAILABLE;
 import static java.util.Objects.requireNonNull;
 
@@ -17,9 +17,9 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableSet;
 
-import de.itemis.mosig.jassuan.jscdlib.internal.IntSegment;
-import de.itemis.mosig.jassuan.jscdlib.internal.LongPointerSegment;
-import de.itemis.mosig.jassuan.jscdlib.internal.StringPointerSegment;
+import de.itemis.mosig.jassuan.jscdlib.internal.memory.IntSegment;
+import de.itemis.mosig.jassuan.jscdlib.internal.memory.LongPointerSegment;
+import de.itemis.mosig.jassuan.jscdlib.internal.memory.StringPointerSegment;
 import de.itemis.mosig.jassuan.jscdlib.problem.JScdException;
 import de.itemis.mosig.jassuan.jscdlib.problem.JScdProblem;
 import de.itemis.mosig.jassuan.jscdlib.problem.JScdProblems;
@@ -63,14 +63,14 @@ import jdk.incubator.foreign.MemoryAddress;
  * </ul>
  * </p>
  */
-public final class JScdHandle implements AutoCloseable {
+public final class JSCardHandle implements AutoCloseable {
 
-    private static final Logger LOG = LoggerFactory.getLogger(JScdHandle.class);
+    private static final Logger LOG = LoggerFactory.getLogger(JSCardHandle.class);
     private static final Set<JScdProblem> NON_FATAL_PROBLEMS = ImmutableSet.of(JScdProblems.SCARD_S_SUCCESS, JScdProblems.SCARD_E_NO_READERS_AVAILABLE);
 
-    private final JAssuanNative nativeBridge;
+    private final JScardNative nativeBridge;
 
-    public JScdHandle(JAssuanNative nativeBridge) {
+    public JSCardHandle(JScardNative nativeBridge) {
         this.nativeBridge = requireNonNull(nativeBridge, "nativeBridge");
     }
 

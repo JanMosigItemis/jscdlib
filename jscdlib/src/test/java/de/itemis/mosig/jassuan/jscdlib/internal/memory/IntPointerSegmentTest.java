@@ -1,6 +1,9 @@
-package de.itemis.mosig.jassuan.jscdlib.internal;
+package de.itemis.mosig.jassuan.jscdlib.internal.memory;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -8,13 +11,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import jdk.incubator.foreign.MemoryAddress;
 import jdk.incubator.foreign.MemorySegment;
 
-public class LongPointerSegmentTest {
+public class IntPointerSegmentTest {
 
     private List<MemorySegment> allocatedSegs;
 
@@ -34,12 +34,12 @@ public class LongPointerSegmentTest {
 
     @Test
     public void dereference_string_seg_usecase() {
-        try (var longSeg = new LongSegment()) {
+        try (var intSeg = new IntSegment()) {
             var underTest = allocatePtrSeg();
-            var expectedValue = 123L;
-            longSeg.setValue(expectedValue);
+            var expectedValue = 123;
+            intSeg.setValue(expectedValue);
 
-            underTest.pointTo(longSeg.address());
+            underTest.pointTo(intSeg.address());
 
             assertThat(underTest.dereference()).isEqualTo(expectedValue);
         }
@@ -48,15 +48,15 @@ public class LongPointerSegmentTest {
     @Test
     public void no_arg_constructor_creates_new_seg_containing_zero() {
         var underTest = allocatePtrSeg();
-        assertThat(underTest.getValue()).isEqualTo(0L);
+        assertThat(underTest.getValue()).isEqualTo(-1L);
     }
 
     @ParameterizedTest
-    @ValueSource(longs = {Long.MIN_VALUE, Long.MAX_VALUE})
-    public void dereference_works_with_long_boundaries(long expectedValue) {
+    @ValueSource(ints = {Integer.MIN_VALUE, Integer.MAX_VALUE})
+    public void dereference_works_with_int_boundaries(int expectedValue) {
         var thisSegHoldsTheValue = allocateSeg();
         thisSegHoldsTheValue.setValue(expectedValue);
-        var thisSegHoldsTheAddr = allocateSeg();
+        var thisSegHoldsTheAddr = allocatePtrSeg();
         thisSegHoldsTheAddr.setValue(thisSegHoldsTheValue.address().toRawLongValue());
         var underTest = allocatePtrSeg(thisSegHoldsTheAddr.address());
 
@@ -71,20 +71,20 @@ public class LongPointerSegmentTest {
         assertThat(underTest.address()).isEqualTo(expectedAddr);
     }
 
-    private LongSegment allocateSeg() {
-        var result = new LongSegment();
+    private IntSegment allocateSeg() {
+        var result = new IntSegment();
         allocatedSegs.add(result);
         return result;
     }
 
-    private LongPointerSegment allocatePtrSeg() {
-        var result = new LongPointerSegment();
+    private IntPointerSegment allocatePtrSeg() {
+        var result = new IntPointerSegment();
         allocatedSegs.add(result);
         return result;
     }
 
-    private LongPointerSegment allocatePtrSeg(MemoryAddress addr) {
-        var result = new LongPointerSegment(addr);
+    private IntPointerSegment allocatePtrSeg(MemoryAddress addr) {
+        var result = new IntPointerSegment(addr);
         allocatedSegs.add(result);
         return result;
     }

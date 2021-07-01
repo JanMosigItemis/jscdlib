@@ -1,4 +1,4 @@
-package de.itemis.mosig.jassuan.jscdlib.internal;
+package de.itemis.mosig.jassuan.jscdlib.internal.memory;
 
 import static java.util.Objects.requireNonNull;
 
@@ -8,19 +8,24 @@ import jdk.incubator.foreign.MemorySegment;
 
 public class LongSegment extends MemorySegmentDelegate implements ValueSegment<Long> {
 
-    private static final long INITIAL_VALUE = 0L;
+    private static final long DEFAULT_VALUE = -1L;
 
     public LongSegment() {
         super(MemorySegment.allocateNative(MemoryLayouts.JAVA_LONG));
-        setValue(INITIAL_VALUE);
+        setValue(DEFAULT_VALUE);
     }
 
-    public LongSegment(MemoryAddress addr) {
-        super(addr, MemoryLayouts.JAVA_LONG.byteSize());
+    public LongSegment(MemoryAddress addrOfInitialValueSeg) {
+        super(addrOfInitialValueSeg, MemoryLayouts.JAVA_LONG.byteSize());
     }
 
-    public LongSegment(MemorySegment segment) {
-        super(segment);
+    public LongSegment(MemorySegment initialValueSeg) {
+        super(initialValueSeg);
+    }
+
+    public LongSegment(long initialValue) {
+        this();
+        setValue(initialValue);
     }
 
     @Override
