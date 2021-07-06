@@ -12,7 +12,7 @@ import jdk.incubator.foreign.CLinker;
 import jdk.incubator.foreign.LibraryLookup;
 import jdk.incubator.foreign.MemoryAddress;
 
-public class JScardNativeLinuxImpl extends JScardNativeBase implements JScardNative {
+public class JScardNativeLinuxImpl extends NativeBase implements JScardNative {
 
     private static final Logger LOG = LoggerFactory.getLogger(JScardNativeLinuxImpl.class);
 

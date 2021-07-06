@@ -9,13 +9,13 @@ import org.junit.jupiter.api.Test;
 
 import de.itemis.mosig.jassuan.jscdlib.problem.JScdException;
 
-public class JScardNativeBaseTest {
+public class NativeBaseTest {
 
-    private JScardNativeBase underTest;
+    private NativeBase underTest;
 
     @BeforeEach
     public void setUp() {
-        underTest = new JScardNativeBase() {};
+        underTest = new NativeBase() {};
     }
 
     @Test
@@ -31,8 +31,20 @@ public class JScardNativeBaseTest {
     }
 
     @Test
-    public void when_method_returns_error_return_error() {
-        var expectedReturnCode = 1L;
-        assertThat(underTest.callNativeFunction(() -> expectedReturnCode)).isEqualTo(expectedReturnCode);
+    public void when_void_method_throws_then_runtime_exception() {
+        var expected = new JScdException(EXPECTED_CHECKED_EXCEPTION);
+
+        assertThatThrownBy(() -> underTest.callNativeVoidFunction(() -> {
+            throw EXPECTED_CHECKED_EXCEPTION;
+        }))
+            .isInstanceOf(JScdException.class)
+            .hasMessage(expected.getMessage())
+            .hasCause(EXPECTED_CHECKED_EXCEPTION);
+    }
+
+    @Test
+    public void return_wahtever_native_call_returns() {
+        var expectedResult = new Object();
+        assertThat(underTest.callNativeFunction(() -> expectedResult)).isEqualTo(expectedResult);
     }
 }

@@ -9,7 +9,7 @@ import jdk.incubator.foreign.CLinker;
 import jdk.incubator.foreign.LibraryLookup;
 import jdk.incubator.foreign.MemoryAddress;
 
-public class JScardNativeMacImpl extends JScardNativeBase implements JScardNative {
+public class JScardNativeMacImpl extends NativeBase implements JScardNative {
 
     private final NativeMethodHandle<Long> establishCtx;
     private final NativeMethodHandle<Long> listReaders;

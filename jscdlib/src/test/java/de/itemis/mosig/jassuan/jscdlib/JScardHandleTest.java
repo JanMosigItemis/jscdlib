@@ -46,9 +46,9 @@ import de.itemis.mosig.jassuan.jscdlib.problem.JScdProblem;
 import de.itemis.mosig.jassuan.jscdlib.problem.JScdProblems;
 import jdk.incubator.foreign.MemoryAddress;
 
-public class JScdHandleTest {
+public class JScardHandleTest {
 
-    private static final Logger LOG = LoggerFactory.getLogger(JScdHandleTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(JScardHandleTest.class);
 
     private static final String READER_ONE = "readerOne";
     private static final String READER_TWO = "readerTwo";

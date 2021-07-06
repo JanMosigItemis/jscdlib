@@ -87,6 +87,6 @@ public class StringSegmentTest {
 
     @Test
     public void constructor_does_not_accept_null_str() {
-        assertNullArgNotAccepted(arg -> new StringSegment((String) null), "initialValue");
+        assertNullArgNotAccepted(() -> new StringSegment((String) null), "initialValue");
     }
 }

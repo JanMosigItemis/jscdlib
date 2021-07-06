@@ -3,6 +3,9 @@ package de.itemis.mosig.jassuan.jscdlib;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.itemis.mosig.jassuan.jscdlib.internal.JAssuanNativeLinuxImpl;
+import de.itemis.mosig.jassuan.jscdlib.internal.JAssuanNativeMacImpl;
+import de.itemis.mosig.jassuan.jscdlib.internal.JAssuanNativeWinImpl;
 import de.itemis.mosig.jassuan.jscdlib.internal.JScardNativeLinuxImpl;
 import de.itemis.mosig.jassuan.jscdlib.internal.JScardNativeMacImpl;
 import de.itemis.mosig.jassuan.jscdlib.internal.JScardNativeWinImpl;
@@ -43,5 +46,35 @@ public final class JScdLib {
         }
 
         return new JSCardHandle(nativeImpl);
+    }
+
+    /**
+     * <p>
+     * Create a new handle. The handle will use the {@link JScardNative} implementation appropriate
+     * for the current OS.
+     * </p>
+     * <p>
+     * <b>Be aware:</b> The handle does hold resources and should therefore be closed when not
+     * needed anymore in order to prevent resource leaks.
+     * </p>
+     *
+     * @return A new instance of {@link JAssuanHandle}.
+     */
+    public static JAssuanHandle constructAssuanHandle() {
+        JAssuanNative nativeImpl = null;
+
+        var osDetector = new OsDetector();
+        if (osDetector.isWindows()) {
+            LOG.debug("Identified OS type Windows");
+            nativeImpl = new JAssuanNativeWinImpl();
+        } else if (osDetector.isMac()) {
+            LOG.debug("Identified OS type Mac");
+            nativeImpl = new JAssuanNativeMacImpl();
+        } else {
+            LOG.debug("Identified OS type other. Using Linux implementation.");
+            nativeImpl = new JAssuanNativeLinuxImpl();
+        }
+
+        return new JAssuanHandle(nativeImpl);
     }
 }
