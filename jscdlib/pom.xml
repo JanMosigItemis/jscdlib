@@ -81,8 +81,13 @@
         <awaitility.version>4.1.0</awaitility.version>
         <arch.unit.version>0.19.0</arch.unit.version>
         <fluffy.tests.version>1.0.0-SNAPSHOT</fluffy.tests.version>
-        <custom.jvm.options>-Dforeign.restricted=permit
-            --add-modules=jdk.incubator.foreign</custom.jvm.options>
+        <system.lambda.version>1.2.0</system.lambda.version>
+        <custom.jvm.options>
+            -Dforeign.restricted=permit
+            --add-modules=jdk.incubator.foreign
+            --illegal-access=permit
+            --add-opens=java.base/java.util=ALL-UNNAMED
+        </custom.jvm.options>
     </properties>
 
     <dependencyManagement>
@@ -170,6 +175,11 @@
                 <artifactId>de.itemis.mosig.fluffy.tests.java</artifactId>
                 <version>${fluffy.tests.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.github.stefanbirkner</groupId>
+                <artifactId>system-lambda</artifactId>
+                <version>${system.lambda.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -243,6 +253,11 @@
         <dependency>
             <groupId>de.itemis.mosig.fluffy</groupId>
             <artifactId>de.itemis.mosig.fluffy.tests.java</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.stefanbirkner</groupId>
+            <artifactId>system-lambda</artifactId>
+            <scope>test</scope>
         </dependency>
         <!-- End of test dependencies -->
     </dependencies>

@@ -1,6 +1,5 @@
 package de.itemis.mosig.jassuan.jscdlib;
 
-import static de.itemis.mosig.fluffy.tests.java.exceptions.ExpectedExceptions.EXPECTED_CHECKED_EXCEPTION;
 import static de.itemis.mosig.fluffy.tests.java.exceptions.ThrowablePrettyfier.pretty;
 import static de.itemis.mosig.jassuan.jscdlib.JAssuanNative.ASSUAN_INVALID_PID;
 import static de.itemis.mosig.jassuan.jscdlib.JAssuanNative.ASSUAN_SOCKET_CONNECT_FDPASSING;
@@ -22,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableSet;
 
+import de.itemis.mosig.jassuan.jscdlib.internal.JScdSocketDiscovery;
 import de.itemis.mosig.jassuan.jscdlib.internal.memory.LongPointerSegment;
 import de.itemis.mosig.jassuan.jscdlib.problem.JScdException;
 import de.itemis.mosig.jassuan.jscdlib.problem.JScdProblem;
@@ -50,16 +50,24 @@ public class JAssuanHandle implements AutoCloseable {
      *
      * @param nativeBridge OS dependent implementation to use when calling low level library
      *        functions.
+     * @param socketDiscovery Used to determine the scdaemon socket file to use for communication to
+     *        the daemon.
      */
-    public JAssuanHandle(JAssuanNative nativeBridge) {
+    public JAssuanHandle(JAssuanNative nativeBridge, JScdSocketDiscovery socketDiscovery) {
         this.nativeBridge = requireNonNull(nativeBridge, "nativeBridge");
+        requireNonNull(socketDiscovery, "socketDiscovery");
 
-        ctxPtr = new LongPointerSegment();
-        throwIfNoSuccess(nativeBridge.assuanNew(ctxPtr.address()));
-        ctxAddr = ctxPtr.getContainedAddress();
+        try {
+            ctxPtr = new LongPointerSegment();
+            throwIfNoSuccess(nativeBridge.assuanNew(ctxPtr.address()));
+            ctxAddr = ctxPtr.getContainedAddress();
 
-        var name = CLinker.toCString("C:\\Users\\sturm\\.gnupg\\S.scdaemon", UTF_8).address();
-        throwIfNoSuccess(nativeBridge.assuanSocketConnect(ctxAddr, name, ASSUAN_INVALID_PID, ASSUAN_SOCKET_CONNECT_FDPASSING));
+            var name = CLinker.toCString(socketDiscovery.discover().toString(), UTF_8).address();
+            throwIfNoSuccess(nativeBridge.assuanSocketConnect(ctxAddr, name, ASSUAN_INVALID_PID, ASSUAN_SOCKET_CONNECT_FDPASSING));
+        } catch (Throwable t) {
+            close();
+            throw t;
+        }
     }
 
     /**
@@ -105,18 +113,20 @@ public class JAssuanHandle implements AutoCloseable {
     }
 
     @Override
-    public void close() {
-        if (!isClosed) {
-            synchronized (this) {
-                if (!isClosed) {
-                    isClosed = true;
-                    try {
-                        nativeBridge.assuanRelease(ctxAddr);
-                    } catch (Throwable t) {
-                        LOG.warn(
-                            "Possible ressource leak: Operation assuanRelease could not release assuan context. Reason: " + pretty(EXPECTED_CHECKED_EXCEPTION));
-                    } finally {
-                        ctxPtr.close();
+    public final void close() {
+        if (ctxAddr != null) {
+            if (!isClosed) {
+                synchronized (this) {
+                    if (!isClosed) {
+                        isClosed = true;
+                        try {
+                            nativeBridge.assuanRelease(ctxAddr);
+                        } catch (Throwable t) {
+                            LOG.warn(
+                                "Possible ressource leak: Operation assuanRelease could not release assuan context. Reason: " + pretty(t));
+                        } finally {
+                            safeClose(ctxPtr);
+                        }
                     }
                 }
             }
@@ -130,6 +140,15 @@ public class JAssuanHandle implements AutoCloseable {
         }
 
         return problem;
+    }
+
+    private void safeClose(AutoCloseable closeable) {
+        try {
+            closeable.close();
+        } catch (Exception e) {
+            var msg = e.getMessage() == null ? "No further information." : e.getMessage();
+            LOG.warn("Possible ressource leak: Closing a ressource encountered a problem: " + e.getClass().getSimpleName() + ": " + msg);
+        }
     }
 
     private static final class TransactCallback {

@@ -16,6 +16,9 @@
     <!-- Set JETTY logging to level INFO -->
     <logger name="org.eclipse" level="INFO" />
 
+    <!-- Prevent logback from logging its own messages -->
+    <!-- <statusListener class="ch.qos.logback.core.status.NopStatusListener" /> -->
+    
     <root level="debug">
         <appender-ref ref="STDOUT" />
     </root>

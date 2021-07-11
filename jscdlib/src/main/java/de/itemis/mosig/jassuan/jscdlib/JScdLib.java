@@ -9,6 +9,7 @@ import de.itemis.mosig.jassuan.jscdlib.internal.JAssuanNativeWinImpl;
 import de.itemis.mosig.jassuan.jscdlib.internal.JScardNativeLinuxImpl;
 import de.itemis.mosig.jassuan.jscdlib.internal.JScardNativeMacImpl;
 import de.itemis.mosig.jassuan.jscdlib.internal.JScardNativeWinImpl;
+import de.itemis.mosig.jassuan.jscdlib.internal.JScdSocketDiscovery;
 import de.itemis.mosig.jassuan.jscdlib.internal.OsDetector;
 
 /**
@@ -17,6 +18,26 @@ import de.itemis.mosig.jassuan.jscdlib.internal.OsDetector;
 public final class JScdLib {
 
     private static final Logger LOG = LoggerFactory.getLogger(JScdLib.class);
+
+    private static final boolean IS_WINDOWS;
+    private static final boolean IS_MAC;
+
+    static {
+        var osDetector = new OsDetector();
+        if (osDetector.isWindows()) {
+            LOG.debug("Identified OS type Windows");
+            IS_WINDOWS = true;
+            IS_MAC = false;
+        } else if (osDetector.isMac()) {
+            LOG.debug("Identified OS type Mac");
+            IS_WINDOWS = false;
+            IS_MAC = true;
+        } else {
+            LOG.debug("Identified OS type other. Assuming Linux or compatible.");
+            IS_WINDOWS = false;
+            IS_MAC = false;
+        }
+    }
 
     /**
      * <p>
@@ -33,15 +54,11 @@ public final class JScdLib {
     public static JSCardHandle constructSCardHandle() {
         JScardNative nativeImpl = null;
 
-        var osDetector = new OsDetector();
-        if (osDetector.isWindows()) {
-            LOG.debug("Identified OS type Windows");
+        if (IS_WINDOWS) {
             nativeImpl = new JScardNativeWinImpl();
-        } else if (osDetector.isMac()) {
-            LOG.debug("Identified OS type Mac");
+        } else if (IS_MAC) {
             nativeImpl = new JScardNativeMacImpl();
         } else {
-            LOG.debug("Identified OS type other. Using Linux implementation.");
             nativeImpl = new JScardNativeLinuxImpl();
         }
 
@@ -63,18 +80,14 @@ public final class JScdLib {
     public static JAssuanHandle constructAssuanHandle() {
         JAssuanNative nativeImpl = null;
 
-        var osDetector = new OsDetector();
-        if (osDetector.isWindows()) {
-            LOG.debug("Identified OS type Windows");
+        if (IS_WINDOWS) {
             nativeImpl = new JAssuanNativeWinImpl();
-        } else if (osDetector.isMac()) {
-            LOG.debug("Identified OS type Mac");
+        } else if (IS_MAC) {
             nativeImpl = new JAssuanNativeMacImpl();
         } else {
-            LOG.debug("Identified OS type other. Using Linux implementation.");
             nativeImpl = new JAssuanNativeLinuxImpl();
         }
 
-        return new JAssuanHandle(nativeImpl);
+        return new JAssuanHandle(nativeImpl, new JScdSocketDiscovery());
     }
 }

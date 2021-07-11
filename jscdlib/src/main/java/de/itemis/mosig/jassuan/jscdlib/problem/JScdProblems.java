@@ -82,7 +82,15 @@ public enum JScdProblems
      */
     GPG_ERR_ENODEV(
             0x6008050L,
-            "No device attached to the system");
+            "No device attached to the system"),
+
+    /**
+     * 0x90000000 - Encountered an error
+     */
+    JSCD_GENERAL_ERROR(
+            0x90000000L,
+            "Encountered an error");
+
 
     private final long errorCode;
     private final String description;

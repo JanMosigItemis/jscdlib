@@ -17,6 +17,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.nio.file.Paths;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,6 +27,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.stubbing.Answer;
 
 import de.itemis.mosig.fluffy.tests.java.logging.FluffyTestAppender;
+import de.itemis.mosig.jassuan.jscdlib.internal.JScdSocketDiscovery;
 import de.itemis.mosig.jassuan.jscdlib.internal.memory.LongPointerSegment;
 import de.itemis.mosig.jassuan.jscdlib.internal.memory.LongSegment;
 import de.itemis.mosig.jassuan.jscdlib.internal.memory.StringPointerSegment;
@@ -40,6 +43,8 @@ public class JAssuanHandleTest {
     FluffyTestAppender logAssert = new FluffyTestAppender();
 
     private JAssuanNative nativeMock;
+    private JScdSocketDiscovery socketDiscoveryMock;
+
     private AssuanMethodInvocations invocations;
 
     private JAssuanHandle underTest;
@@ -47,13 +52,16 @@ public class JAssuanHandleTest {
     @BeforeEach
     public void setUp() {
         nativeMock = mock(JAssuanNative.class);
+        socketDiscoveryMock = mock(JScdSocketDiscovery.class);
         invocations = new AssuanMethodInvocations();
+
+        when(socketDiscoveryMock.discover()).thenReturn(Paths.get("scdaemon.socket.file"));
 
         assuanNewReturns(SUCCESS);
         assuanSocketConnectReturns(SUCCESS);
         assuanTransactReturns(SUCCESS);
 
-        underTest = new JAssuanHandle(nativeMock);
+        underTest = constructUnderTest();
 
         verify(nativeMock, times(1)).assuanNew(any(MemoryAddress.class));
         verify(nativeMock, times(1)).assuanSocketConnect(eq(invocations.ctx), any(MemoryAddress.class), eq(ASSUAN_INVALID_PID),
@@ -68,13 +76,18 @@ public class JAssuanHandleTest {
     }
 
     @Test
-    public void constructorDoesNotAcceptNull() {
-        assertNullArgNotAccepted(() -> new JAssuanHandle(null), "nativeBridge");
+    public void constructorDoesNotAcceptNullAsNativeBridge() {
+        assertNullArgNotAccepted(() -> new JAssuanHandle(null, socketDiscoveryMock), "nativeBridge");
+    }
+
+    @Test
+    public void constructorDoesNotAcceptNullAsSocketDiscovery() {
+        assertNullArgNotAccepted(() -> new JAssuanHandle(nativeMock, null), "socketDiscovery");
     }
 
     @Test
     public void close_closes_ctx_and_segment() {
-        try (var l = new JAssuanHandle(nativeMock)) {
+        try (var l = constructUnderTest()) {
 
         } finally {
             verify(nativeMock, times(1)).assuanRelease(eq(invocations.ctx));
@@ -87,7 +100,7 @@ public class JAssuanHandleTest {
 
         assuanNewReturns(invocation -> expectedProblem.errorCode());
 
-        try (var localUnderTest = new JAssuanHandle(nativeMock)) {
+        try (var localUnderTest = constructUnderTest()) {
             Assertions.fail("No exception was thrown");
         } catch (Exception e) {
             assertThat(e).as("Expected exception in case of an error in smart card native code.")
@@ -102,7 +115,7 @@ public class JAssuanHandleTest {
 
         assuanSocketConnectReturns(invocation -> expectedProblem.errorCode());
 
-        try (var localUnderTest = new JAssuanHandle(nativeMock)) {
+        try (var localUnderTest = constructUnderTest()) {
             Assertions.fail("No exception was thrown");
         } catch (Exception e) {
             assertThat(e).as("Expected exception in case of an error in smart card native code.")
@@ -189,5 +202,9 @@ public class JAssuanHandleTest {
 
     private void assuanReleaseReturns(Answer<Void> answer) {
         doAnswer(answer).when(nativeMock).assuanRelease(any(MemoryAddress.class));
+    }
+
+    private JAssuanHandle constructUnderTest() {
+        return new JAssuanHandle(nativeMock, socketDiscoveryMock);
     }
 }

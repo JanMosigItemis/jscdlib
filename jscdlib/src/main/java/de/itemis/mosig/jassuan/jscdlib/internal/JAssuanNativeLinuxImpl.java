@@ -22,7 +22,8 @@ public class JAssuanNativeLinuxImpl extends NativeBase implements JAssuanNative 
     private final NativeMethodHandle<Long> assuanTransact;
 
     public JAssuanNativeLinuxImpl() {
-        var lib = LibraryLookup.ofLibrary("libassuan6-0");
+        var lib = loadLib();
+
         assuanNew = NativeMethodHandle
             .ofLib(lib)
             .returnType(long.class)
