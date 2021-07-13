@@ -7,17 +7,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.api.io.TempDir;
 
 import de.itemis.mosig.fluffy.tests.java.FluffySystemProperties;
+import de.itemis.mosig.jassuan.jscdlib.JScdSocketDiscovery;
 import de.itemis.mosig.jassuan.jscdlib.problem.JScdException;
 
-public class JScdSocketDiscoveryTest {
+public class JScdSocketDiscoveryFallbackTest {
 
     private static final String JSCDLIB_SOCKET_FILE_PROP_KEY = "jscdlib.socket.file";
     private static final String GNUPGHOME_ENV_KEY = "GNUPGHOME";
@@ -26,11 +31,17 @@ public class JScdSocketDiscoveryTest {
     @RegisterExtension
     FluffySystemProperties fluffyProps = new FluffySystemProperties();
 
+    @TempDir
+    Path tempDir;
+
+    private Path testSocketFilePath;
+
     private JScdSocketDiscovery underTest;
 
     @BeforeEach
-    public void setUp() {
-        underTest = new JScdSocketDiscovery();
+    public void setUp() throws Exception {
+        testSocketFilePath = Files.createFile(tempDir.resolve(SOCKET_FILE_NAME));
+        underTest = new JScdSocketDiscoveryFallback();
     }
 
     @Test
@@ -42,8 +53,8 @@ public class JScdSocketDiscoveryTest {
     }
 
     @Test
-    public void windows_when_only_env_then_return_its_value_plus_filename_as_uri() throws Exception {
-        String envValue = "C:\\Users\\itsme\\.gnupg";
+    public void when_only_env_then_return_its_value_plus_filename() throws Exception {
+        String envValue = tempDir.toString();
         var expectedResult = Paths.get(envValue, SOCKET_FILE_NAME);
         var actualResult = withEnvironmentVariable(GNUPGHOME_ENV_KEY, envValue).execute(() -> underTest.discover());
 
@@ -51,16 +62,7 @@ public class JScdSocketDiscoveryTest {
     }
 
     @Test
-    public void unix_when_only_env_then_return_its_value_plus_filename_as_uri() throws Exception {
-        String envValue = "/home/itsme/.gnupg";
-        var expectedResult = Paths.get(envValue, SOCKET_FILE_NAME);
-        var actualResult = withEnvironmentVariable(GNUPGHOME_ENV_KEY, envValue).execute(() -> underTest.discover());
-
-        assertThat(actualResult).isEqualTo(expectedResult);
-    }
-
-    @Test
-    public void when_only_env_and_value_cannot_be_converted_to_uri_then_jscdexception() {
+    public void when_only_env_and_value_cannot_be_converted_to_path_then_jscdexception() {
         String envValue = "#?=)(/&";
         assertThatThrownBy(() -> withEnvironmentVariable(GNUPGHOME_ENV_KEY, envValue).execute(() -> underTest.discover())).isInstanceOf(JScdException.class)
             .hasFieldOrPropertyWithValue("problem",
@@ -70,8 +72,8 @@ public class JScdSocketDiscoveryTest {
     }
 
     @Test
-    public void windows_when_only_prop_then_return_its_value_as_uri() {
-        String propValue = "C:\\Users\\itsme\\.gnupg\\" + SOCKET_FILE_NAME;
+    public void when_only_prop_then_return_its_value() {
+        String propValue = testSocketFilePath.toString();
         var expectedResult = Paths.get(propValue);
         System.setProperty(JSCDLIB_SOCKET_FILE_PROP_KEY, propValue);
         var actualResult = underTest.discover();
@@ -80,20 +82,10 @@ public class JScdSocketDiscoveryTest {
     }
 
     @Test
-    public void unix_when_only_prop_then_return_its_value_as_uri() {
-        String propValue = "/home/itsme/.gnupg/" + SOCKET_FILE_NAME;
-        var expectedResult = Paths.get(propValue);
-        System.setProperty(JSCDLIB_SOCKET_FILE_PROP_KEY, propValue);
-        var actualResult = underTest.discover();
-
-        assertThat(actualResult).isEqualTo(expectedResult);
-    }
-
-    @Test
-    public void when_only_prop_and_value_cannot_be_converted_to_uri_then_jscdexception() {
+    public void when_only_prop_and_value_cannot_be_converted_to_path_then_jscdexception() {
         String propValue = "#?=)(/&";
         System.setProperty(JSCDLIB_SOCKET_FILE_PROP_KEY, propValue);
-        assertThatThrownBy(() -> withEnvironmentVariable(GNUPGHOME_ENV_KEY, propValue).execute(() -> underTest.discover())).isInstanceOf(JScdException.class)
+        assertThatThrownBy(() -> underTest.discover()).isInstanceOf(JScdException.class)
             .hasFieldOrPropertyWithValue("problem",
                 JSCD_GENERAL_ERROR)
             .hasMessageContaining("Converting value '" + propValue + "' to path caused: "
@@ -102,13 +94,26 @@ public class JScdSocketDiscoveryTest {
 
     @Test
     public void prop_overrides_env_if_both_exist() throws Exception {
-        var propValue = "propValue";
+        var propValue = testSocketFilePath.toString();
         var envValue = "envValue";
         var expectedResult = Paths.get(propValue);
-        System.setProperty(JSCDLIB_SOCKET_FILE_PROP_KEY, propValue);
 
+        System.setProperty(JSCDLIB_SOCKET_FILE_PROP_KEY, propValue);
         var actualResult = withEnvironmentVariable(GNUPGHOME_ENV_KEY, envValue).execute(() -> underTest.discover());
 
         assertThat(actualResult).isEqualTo(expectedResult);
+    }
+
+    @Test
+    public void when_file_does_not_exist_then_jscdexception() throws Exception {
+        Files.delete(testSocketFilePath);
+
+        String propValue = testSocketFilePath.toString();
+        System.setProperty(JSCDLIB_SOCKET_FILE_PROP_KEY, propValue);
+        assertThatThrownBy(() -> underTest.discover()).isInstanceOf(JScdException.class)
+            .hasFieldOrPropertyWithValue("problem",
+                JSCD_GENERAL_ERROR)
+            .hasMessageContaining("Converting value '" + propValue + "' to path caused: "
+                + pretty(new FileNotFoundException(testSocketFilePath + " is not a valid socket file")));
     }
 }

@@ -21,7 +21,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableSet;
 
-import de.itemis.mosig.jassuan.jscdlib.internal.JScdSocketDiscovery;
 import de.itemis.mosig.jassuan.jscdlib.internal.memory.LongPointerSegment;
 import de.itemis.mosig.jassuan.jscdlib.problem.JScdException;
 import de.itemis.mosig.jassuan.jscdlib.problem.JScdProblem;

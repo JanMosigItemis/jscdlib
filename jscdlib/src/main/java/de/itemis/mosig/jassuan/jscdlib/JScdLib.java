@@ -9,7 +9,8 @@ import de.itemis.mosig.jassuan.jscdlib.internal.JAssuanNativeWinImpl;
 import de.itemis.mosig.jassuan.jscdlib.internal.JScardNativeLinuxImpl;
 import de.itemis.mosig.jassuan.jscdlib.internal.JScardNativeMacImpl;
 import de.itemis.mosig.jassuan.jscdlib.internal.JScardNativeWinImpl;
-import de.itemis.mosig.jassuan.jscdlib.internal.JScdSocketDiscovery;
+import de.itemis.mosig.jassuan.jscdlib.internal.JScdGpgConfSocketDiscovery;
+import de.itemis.mosig.jassuan.jscdlib.internal.JScdSocketDiscoveryFallback;
 import de.itemis.mosig.jassuan.jscdlib.internal.OsDetector;
 
 /**
@@ -88,6 +89,6 @@ public final class JScdLib {
             nativeImpl = new JAssuanNativeLinuxImpl();
         }
 
-        return new JAssuanHandle(nativeImpl, new JScdSocketDiscovery());
+        return new JAssuanHandle(nativeImpl, new JScdGpgConfSocketDiscovery(new JScdSocketDiscoveryFallback()));
     }
 }
