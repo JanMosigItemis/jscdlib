@@ -1,7 +1,7 @@
 package de.itemis.mosig.jassuan.jscdlib.problem;
 
-import static de.itemis.mosig.fluffy.tests.java.FluffyTestHelper.assertSerialVersionUid;
-import static de.itemis.mosig.fluffy.tests.java.exceptions.ExpectedExceptions.EXPECTED_CHECKED_EXCEPTION;
+import static de.itemis.mosig.fluffyj.tests.FluffyTestHelper.assertSerialVersionUid;
+import static de.itemis.mosig.fluffyj.tests.exceptions.ExpectedExceptions.EXPECTED_CHECKED_EXCEPTION;
 import static de.itemis.mosig.jassuan.jscdlib.problem.JScdProblems.SCARD_F_INTERNAL_ERROR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

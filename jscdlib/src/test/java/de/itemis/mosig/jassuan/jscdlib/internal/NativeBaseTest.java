@@ -1,6 +1,6 @@
 package de.itemis.mosig.jassuan.jscdlib.internal;
 
-import static de.itemis.mosig.fluffy.tests.java.exceptions.ExpectedExceptions.EXPECTED_CHECKED_EXCEPTION;
+import static de.itemis.mosig.fluffyj.tests.exceptions.ExpectedExceptions.EXPECTED_CHECKED_EXCEPTION;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 

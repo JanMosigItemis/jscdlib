@@ -1,7 +1,7 @@
 package de.itemis.mosig.jassuan.jscdlib.internal;
 
 import static com.github.stefanbirkner.systemlambda.SystemLambda.withEnvironmentVariable;
-import static de.itemis.mosig.fluffy.tests.java.exceptions.ThrowablePrettyfier.pretty;
+import static de.itemis.mosig.fluffyj.exceptions.ThrowablePrettyfier.pretty;
 import static de.itemis.mosig.jassuan.jscdlib.problem.JScdProblems.JSCD_GENERAL_ERROR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.api.io.TempDir;
 
-import de.itemis.mosig.fluffy.tests.java.FluffySystemProperties;
+import de.itemis.mosig.fluffyj.tests.FluffyTestSystemProperties;
 import de.itemis.mosig.jassuan.jscdlib.JScdSocketDiscovery;
 import de.itemis.mosig.jassuan.jscdlib.problem.JScdException;
 
@@ -29,7 +29,7 @@ public class JScdSocketDiscoveryFallbackTest {
     private static final String SOCKET_FILE_NAME = "S.scdaemon";
 
     @RegisterExtension
-    FluffySystemProperties fluffyProps = new FluffySystemProperties();
+    FluffyTestSystemProperties fluffyProps = new FluffyTestSystemProperties();
 
     @TempDir
     Path tempDir;

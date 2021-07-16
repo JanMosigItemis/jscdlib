@@ -6,14 +6,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-import de.itemis.mosig.fluffy.tests.java.FluffySystemProperties;
+import de.itemis.mosig.fluffyj.tests.FluffyTestSystemProperties;
 
 public class OsDetectorTest {
 
     private static final String OS_NAME_KEY = "os.name";
 
     @RegisterExtension
-    FluffySystemProperties sysProps = new FluffySystemProperties();
+    FluffyTestSystemProperties sysProps = new FluffyTestSystemProperties();
 
     private OsDetector underTest;
 

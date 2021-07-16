@@ -80,7 +80,7 @@
         <equalsverifier.version>3.6.1</equalsverifier.version>
         <awaitility.version>4.1.0</awaitility.version>
         <arch.unit.version>0.19.0</arch.unit.version>
-        <fluffy.tests.version>1.0.0-SNAPSHOT</fluffy.tests.version>
+        <fluffyj.version>1.0.0-SNAPSHOT</fluffyj.version>
         <system.lambda.version>1.2.0</system.lambda.version>
         <custom.jvm.options>
             -Dforeign.restricted=permit
@@ -172,8 +172,13 @@
             </dependency>
             <dependency>
                 <groupId>de.itemis.mosig.fluffy</groupId>
-                <artifactId>de.itemis.mosig.fluffy.tests.java</artifactId>
-                <version>${fluffy.tests.version}</version>
+                <artifactId>de.itemis.mosig.fluffyj</artifactId>
+                <version>${fluffyj.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>de.itemis.mosig.fluffy</groupId>
+                <artifactId>de.itemis.mosig.fluffyj.tests</artifactId>
+                <version>${fluffyj.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.github.stefanbirkner</groupId>
@@ -197,6 +202,10 @@
                 JSR-305 -->
             <groupId>com.github.spotbugs</groupId>
             <artifactId>spotbugs</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.itemis.mosig.fluffy</groupId>
+            <artifactId>de.itemis.mosig.fluffyj</artifactId>
         </dependency>
 
         <!-- Test Dependencies -->
@@ -252,7 +261,8 @@
         </dependency>
         <dependency>
             <groupId>de.itemis.mosig.fluffy</groupId>
-            <artifactId>de.itemis.mosig.fluffy.tests.java</artifactId>
+            <artifactId>de.itemis.mosig.fluffyj.tests</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.github.stefanbirkner</groupId>

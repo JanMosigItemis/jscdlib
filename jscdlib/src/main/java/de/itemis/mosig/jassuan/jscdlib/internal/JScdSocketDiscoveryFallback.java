@@ -1,6 +1,6 @@
 package de.itemis.mosig.jassuan.jscdlib.internal;
 
-import static de.itemis.mosig.fluffy.tests.java.exceptions.ThrowablePrettyfier.pretty;
+import static de.itemis.mosig.fluffyj.exceptions.ThrowablePrettyfier.pretty;
 
 import java.io.File;
 import java.io.FileNotFoundException;
