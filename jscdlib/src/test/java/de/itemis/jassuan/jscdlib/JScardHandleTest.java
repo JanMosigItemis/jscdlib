@@ -34,8 +34,9 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.itemis.fluffyj.tests.FluffyTestHelper;
-import de.itemis.fluffyj.tests.logging.FluffyTestAppender;
+import com.itemis.fluffyj.tests.FluffyTestHelper;
+import com.itemis.fluffyj.tests.logging.FluffyTestAppender;
+
 import de.itemis.jassuan.jscdlib.internal.memory.IntSegment;
 import de.itemis.jassuan.jscdlib.internal.memory.LongPointerSegment;
 import de.itemis.jassuan.jscdlib.internal.memory.LongSegment;

@@ -1,7 +1,7 @@
 package de.itemis.jassuan.jscdlib.internal;
 
 import static com.github.stefanbirkner.systemlambda.SystemLambda.withEnvironmentVariable;
-import static de.itemis.fluffyj.exceptions.ThrowablePrettyfier.pretty;
+import static com.itemis.fluffyj.exceptions.ThrowablePrettyfier.pretty;
 import static de.itemis.jassuan.jscdlib.problem.JScdProblems.JSCD_GENERAL_ERROR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -18,7 +18,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.api.io.TempDir;
 
-import de.itemis.fluffyj.tests.FluffyTestSystemProperties;
+import com.itemis.fluffyj.tests.FluffyTestSystemProperties;
+
 import de.itemis.jassuan.jscdlib.JScdSocketDiscovery;
 import de.itemis.jassuan.jscdlib.problem.JScdException;
 

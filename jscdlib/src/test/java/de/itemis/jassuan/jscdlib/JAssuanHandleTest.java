@@ -1,9 +1,9 @@
 package de.itemis.jassuan.jscdlib;
 
 import static ch.qos.logback.classic.Level.WARN;
-import static de.itemis.fluffyj.exceptions.ThrowablePrettyfier.pretty;
-import static de.itemis.fluffyj.tests.FluffyTestHelper.assertNullArgNotAccepted;
-import static de.itemis.fluffyj.tests.exceptions.ExpectedExceptions.EXPECTED_CHECKED_EXCEPTION;
+import static com.itemis.fluffyj.exceptions.ThrowablePrettyfier.pretty;
+import static com.itemis.fluffyj.tests.FluffyTestHelper.assertNullArgNotAccepted;
+import static com.itemis.fluffyj.tests.exceptions.ExpectedExceptions.EXPECTED_CHECKED_EXCEPTION;
 import static de.itemis.jassuan.jscdlib.JAssuanNative.ASSUAN_INVALID_PID;
 import static de.itemis.jassuan.jscdlib.JAssuanNative.ASSUAN_SOCKET_CONNECT_FDPASSING;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -26,7 +26,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.stubbing.Answer;
 
-import de.itemis.fluffyj.tests.logging.FluffyTestAppender;
+import com.itemis.fluffyj.tests.logging.FluffyTestAppender;
+
 import de.itemis.jassuan.jscdlib.internal.JScdSocketDiscoveryFallback;
 import de.itemis.jassuan.jscdlib.internal.memory.LongPointerSegment;
 import de.itemis.jassuan.jscdlib.internal.memory.LongSegment;

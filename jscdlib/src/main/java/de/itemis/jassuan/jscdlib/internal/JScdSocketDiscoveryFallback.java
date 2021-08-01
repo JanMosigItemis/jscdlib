@@ -1,6 +1,6 @@
 package de.itemis.jassuan.jscdlib.internal;
 
-import static de.itemis.fluffyj.exceptions.ThrowablePrettyfier.pretty;
+import static com.itemis.fluffyj.exceptions.ThrowablePrettyfier.pretty;
 
 import java.io.File;
 import java.io.FileNotFoundException;

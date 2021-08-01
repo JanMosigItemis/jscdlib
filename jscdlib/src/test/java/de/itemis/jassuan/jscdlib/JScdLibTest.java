@@ -5,7 +5,7 @@ import java.io.InputStreamReader;
 
 import org.junit.jupiter.api.Test;
 
-import de.itemis.fluffyj.tests.FluffyTestHelper;
+import com.itemis.fluffyj.tests.FluffyTestHelper;
 
 public class JScdLibTest {
 

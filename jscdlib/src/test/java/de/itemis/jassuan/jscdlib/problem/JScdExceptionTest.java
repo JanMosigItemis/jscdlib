@@ -1,7 +1,7 @@
 package de.itemis.jassuan.jscdlib.problem;
 
-import static de.itemis.fluffyj.tests.FluffyTestHelper.assertSerialVersionUid;
-import static de.itemis.fluffyj.tests.exceptions.ExpectedExceptions.EXPECTED_CHECKED_EXCEPTION;
+import static com.itemis.fluffyj.tests.FluffyTestHelper.assertSerialVersionUid;
+import static com.itemis.fluffyj.tests.exceptions.ExpectedExceptions.EXPECTED_CHECKED_EXCEPTION;
 import static de.itemis.jassuan.jscdlib.problem.JScdProblems.SCARD_F_INTERNAL_ERROR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

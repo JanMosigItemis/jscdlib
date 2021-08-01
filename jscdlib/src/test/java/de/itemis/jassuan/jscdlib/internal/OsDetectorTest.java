@@ -6,7 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-import de.itemis.fluffyj.tests.FluffyTestSystemProperties;
+import com.itemis.fluffyj.tests.FluffyTestSystemProperties;
 
 public class OsDetectorTest {
 

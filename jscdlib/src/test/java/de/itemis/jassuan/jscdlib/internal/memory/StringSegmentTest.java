@@ -1,6 +1,6 @@
 package de.itemis.jassuan.jscdlib.internal.memory;
 
-import static de.itemis.fluffyj.tests.FluffyTestHelper.assertNullArgNotAccepted;
+import static com.itemis.fluffyj.tests.FluffyTestHelper.assertNullArgNotAccepted;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 

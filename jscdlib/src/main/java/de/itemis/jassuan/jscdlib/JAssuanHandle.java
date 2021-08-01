@@ -1,6 +1,6 @@
 package de.itemis.jassuan.jscdlib;
 
-import static de.itemis.fluffyj.exceptions.ThrowablePrettyfier.pretty;
+import static com.itemis.fluffyj.exceptions.ThrowablePrettyfier.pretty;
 import static de.itemis.jassuan.jscdlib.JAssuanNative.ASSUAN_INVALID_PID;
 import static de.itemis.jassuan.jscdlib.JAssuanNative.ASSUAN_SOCKET_CONNECT_FDPASSING;
 import static java.nio.charset.StandardCharsets.UTF_8;
