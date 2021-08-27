@@ -21,6 +21,7 @@ import org.junit.jupiter.api.io.TempDir;
 import com.itemis.fluffyj.tests.FluffyTestSystemProperties;
 
 import de.itemis.jassuan.jscdlib.JScdSocketDiscovery;
+import de.itemis.jassuan.jscdlib.JScdEnvSocketDiscovery;
 import de.itemis.jassuan.jscdlib.problem.JScdException;
 
 public class JScdSocketDiscoveryFallbackTest {
@@ -42,7 +43,7 @@ public class JScdSocketDiscoveryFallbackTest {
     @BeforeEach
     public void setUp() throws Exception {
         testSocketFilePath = Files.createFile(tempDir.resolve(SOCKET_FILE_NAME));
-        underTest = new JScdSocketDiscoveryFallback();
+        underTest = new JScdEnvSocketDiscovery();
     }
 
     @Test

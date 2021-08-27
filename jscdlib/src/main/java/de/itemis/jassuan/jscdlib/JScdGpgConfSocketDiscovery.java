@@ -1,4 +1,4 @@
-package de.itemis.jassuan.jscdlib.internal;
+package de.itemis.jassuan.jscdlib;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Objects.requireNonNull;
@@ -14,7 +14,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.itemis.jassuan.jscdlib.JScdSocketDiscovery;
 import de.itemis.jassuan.jscdlib.problem.JScdException;
 
 /**

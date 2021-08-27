@@ -13,6 +13,9 @@ public interface JScardNative {
      */
     public static final MemoryAddress SCARD_ALL_READERS = MemoryAddress.NULL;
 
+    /**
+     * Use this value to signal that a lib should automatically allocate memory for lists or arrays.
+     */
     public static final int SCARD_AUTOALLOCATE = -1;
 
     /**

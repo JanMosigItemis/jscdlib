@@ -29,7 +29,14 @@ import jdk.incubator.foreign.CLinker;
 import jdk.incubator.foreign.FunctionDescriptor;
 import jdk.incubator.foreign.MemoryAddress;
 
-public class JAssuanHandle implements AutoCloseable {
+/**
+ * Provides convenient Java versions of libassuan based functionality.
+ * 
+ * @see <a href=
+ *      "https://gnupg.org/software/libassuan/index.html">https://gnupg.org/software/libassuan/index.html</a>
+ *
+ */
+public final class JAssuanHandle implements AutoCloseable {
 
     private static final Logger LOG = LoggerFactory.getLogger(JAssuanHandle.class);
 
@@ -111,6 +118,10 @@ public class JAssuanHandle implements AutoCloseable {
         }
     }
 
+    /**
+     * Release resources hold by this instance. When this method returns, this instance must not be
+     * used anymore.
+     */
     @Override
     public final void close() {
         if (ctxAddr != null) {

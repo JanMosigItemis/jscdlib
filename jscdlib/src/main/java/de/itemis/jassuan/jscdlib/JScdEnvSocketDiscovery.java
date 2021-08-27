@@ -1,4 +1,4 @@
-package de.itemis.jassuan.jscdlib.internal;
+package de.itemis.jassuan.jscdlib;
 
 import static com.itemis.fluffyj.exceptions.ThrowablePrettyfier.pretty;
 
@@ -11,17 +11,46 @@ import java.nio.file.Paths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.itemis.jassuan.jscdlib.JScdSocketDiscovery;
 import de.itemis.jassuan.jscdlib.problem.JScdException;
 import de.itemis.jassuan.jscdlib.problem.JScdProblems;
 
-public final class JScdSocketDiscoveryFallback implements JScdSocketDiscovery {
+/**
+ * <p>
+ * Use the environment to discover scdaemon's socket file path.
+ * </p>
+ * <p>
+ * System properties have priority over environment variables, i. e. if both are available, the
+ * system property wins.
+ * </p>
+ * <p>
+ * Supported values:
+ * <ul>
+ * <li>System property {@value #JSCDLIB_SOCKET_FILE_PROP_KEY} - Absolute path to socket file</li>
+ * <li>Environment variable {@value #GNUPGHOME_ENV_KEY} - Will be appended with
+ * {@value #SOCKET_FILE_NAME} to form a path to a probable socket file.</li>
+ * </ul>
+ * </p>
+ */
+public final class JScdEnvSocketDiscovery implements JScdSocketDiscovery {
 
-    private static final Logger LOG = LoggerFactory.getLogger(JScdSocketDiscoveryFallback.class);
+    private static final Logger LOG = LoggerFactory.getLogger(JScdEnvSocketDiscovery.class);
 
-    private static final String JSCDLIB_SOCKET_FILE_PROP_KEY = "jscdlib.socket.file";
-    private static final String GNUPGHOME_ENV_KEY = "GNUPGHOME";
-    private static final String SOCKET_FILE_NAME = "S.scdaemon";
+    /**
+     * System property that must hold the absolute path to the socket file. Supersedes
+     * {@link #GNUPGHOME_ENV_KEY}.
+     */
+    public static final String JSCDLIB_SOCKET_FILE_PROP_KEY = "jscdlib.socket.file";
+
+    /**
+     * Name of environment variable that holds the path to the GPG installation root. Is superseded
+     * by {@link #JSCDLIB_SOCKET_FILE_PROP_KEY}
+     */
+    public static final String GNUPGHOME_ENV_KEY = "GNUPGHOME";
+
+    /**
+     * Expected default name of scdaemon's socket file.
+     */
+    public static final String SOCKET_FILE_NAME = "S.scdaemon";
 
     @Override
     public Path discover() {

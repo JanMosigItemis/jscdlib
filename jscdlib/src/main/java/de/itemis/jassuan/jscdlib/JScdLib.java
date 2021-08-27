@@ -9,8 +9,6 @@ import de.itemis.jassuan.jscdlib.internal.JAssuanNativeWinImpl;
 import de.itemis.jassuan.jscdlib.internal.JScardNativeLinuxImpl;
 import de.itemis.jassuan.jscdlib.internal.JScardNativeMacImpl;
 import de.itemis.jassuan.jscdlib.internal.JScardNativeWinImpl;
-import de.itemis.jassuan.jscdlib.internal.JScdGpgConfSocketDiscovery;
-import de.itemis.jassuan.jscdlib.internal.JScdSocketDiscoveryFallback;
 import de.itemis.jassuan.jscdlib.internal.OsDetector;
 
 /**
@@ -68,7 +66,7 @@ public final class JScdLib {
 
     /**
      * <p>
-     * Create a new handle. The handle will use the {@link JScardNative} implementation appropriate
+     * Create a new handle. The handle will use the {@link JAssuanNative} implementation appropriate
      * for the current OS.
      * </p>
      * <p>
@@ -89,6 +87,6 @@ public final class JScdLib {
             nativeImpl = new JAssuanNativeLinuxImpl();
         }
 
-        return new JAssuanHandle(nativeImpl, new JScdGpgConfSocketDiscovery(new JScdSocketDiscoveryFallback()));
+        return new JAssuanHandle(nativeImpl, new JScdGpgConfSocketDiscovery(new JScdEnvSocketDiscovery()));
     }
 }

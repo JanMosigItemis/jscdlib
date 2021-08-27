@@ -27,41 +27,11 @@ import jdk.incubator.foreign.MemoryAddress;
 
 /**
  * <p>
- * Instances of this class act as an entry point for all available JScdLib functionality.
- * </p>
- * <p>
- * The handle has the following purposes:
- * <ul>
- * <li>Encapsulate resource (de)allocation in the background.</li>
- * <li>Force client code to explicitly specify dependencies to instances of this class, rather than
- * hiding dependencies by using static library methods, i. e.
- *
- * <pre>
- * // good
- * public class JscdClient {
- *     private final JScdHandle handle;
- *
- *     public JScdClient(JScdHandle handle){
- *     this.handle=handle;
- *     }
- *
- *     public void doSomething() {
- *         handle.someFunctionality();
- *     }
- * }
- *
- *
- * // bad
- * public class JscdClient {
- *     public void doSomething() {
- *         JscdLib.someFunctionality();
- *     }
- * }
- * </pre>
- *
- * </li>
- * </ul>
- * </p>
+ * Provides convenient Java versions of SCard based functionality.
+ * 
+ * @see <a href=
+ *      "https://docs.microsoft.com/en-us/windows/win32/api/winscard/">https://docs.microsoft.com/en-us/windows/win32/api/winscard/</a>
+ *      </p>
  */
 public final class JSCardHandle implements AutoCloseable {
 
@@ -74,6 +44,19 @@ public final class JSCardHandle implements AutoCloseable {
         this.nativeBridge = requireNonNull(nativeBridge, "nativeBridge");
     }
 
+    /**
+     * <p>
+     * Query the OS for available smart card readers.
+     * </p>
+     * <p>
+     * <b>Be aware:</b> The current implementation of this method allocates and destroys resources
+     * each time this method is called, which is a very costly operation. Thus it is not a good idea
+     * to call this method very often in small amount of time.
+     * </p>
+     * 
+     * @return A list of available reader names or empty list if none is available.
+     * @throws JScdException if something went wrong.
+     */
     public List<String> listReaders() {
         List<String> result = new ArrayList<>();
         LongPointerSegment ctxPtrSeg = new LongPointerSegment();

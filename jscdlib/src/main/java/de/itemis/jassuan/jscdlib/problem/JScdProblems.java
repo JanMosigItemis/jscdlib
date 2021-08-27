@@ -4,6 +4,9 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.Arrays;
 
+/**
+ * {@link JScdProblem Problems} that have been translated from C header files, e. g. gpg-error.h
+ */
 public enum JScdProblems
         implements
         JScdProblem {
@@ -115,6 +118,13 @@ public enum JScdProblems
         return description;
     }
 
+    /**
+     * Convert an {@code errorCode} into a matching enum value.
+     * 
+     * @param errorCode Code to find a matching enum value to.
+     * @return A matching {@link JScdProblem} instance.
+     * @throws JScdException if the code is unknown.
+     */
     public static JScdProblem fromError(long errorCode) {
         var problemCandidates = Arrays.stream(JScdProblems.values()).filter(problem -> {
             return problem.errorCode == errorCode;

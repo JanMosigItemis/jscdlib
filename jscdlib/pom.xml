@@ -80,8 +80,8 @@
         <equalsverifier.version>3.6.1</equalsverifier.version>
         <awaitility.version>4.1.0</awaitility.version>
         <arch.unit.version>0.19.0</arch.unit.version>
-        <fluffyj.version>1.4.0</fluffyj.version>
-        <fluffyj-tests.version>1.1.0</fluffyj-tests.version>
+        <fluffyj.version>1.7.0</fluffyj.version>
+        <fluffyj-tests.version>1.2.0</fluffyj-tests.version>
         <system.lambda.version>1.2.0</system.lambda.version>
         <custom.jvm.options>
             -Dforeign.restricted=permit

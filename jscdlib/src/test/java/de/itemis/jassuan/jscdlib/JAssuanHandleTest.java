@@ -28,7 +28,6 @@ import org.mockito.stubbing.Answer;
 
 import com.itemis.fluffyj.tests.logging.FluffyTestAppender;
 
-import de.itemis.jassuan.jscdlib.internal.JScdSocketDiscoveryFallback;
 import de.itemis.jassuan.jscdlib.internal.memory.LongPointerSegment;
 import de.itemis.jassuan.jscdlib.internal.memory.LongSegment;
 import de.itemis.jassuan.jscdlib.internal.memory.StringPointerSegment;
@@ -44,7 +43,7 @@ public class JAssuanHandleTest {
     FluffyTestAppender logAssert = new FluffyTestAppender();
 
     private JAssuanNative nativeMock;
-    private JScdSocketDiscoveryFallback socketDiscoveryMock;
+    private JScdEnvSocketDiscovery socketDiscoveryMock;
 
     private AssuanMethodInvocations invocations;
 
@@ -53,7 +52,7 @@ public class JAssuanHandleTest {
     @BeforeEach
     public void setUp() {
         nativeMock = mock(JAssuanNative.class);
-        socketDiscoveryMock = mock(JScdSocketDiscoveryFallback.class);
+        socketDiscoveryMock = mock(JScdEnvSocketDiscovery.class);
         invocations = new AssuanMethodInvocations();
 
         when(socketDiscoveryMock.discover()).thenReturn(Paths.get("scdaemon.socket.file"));

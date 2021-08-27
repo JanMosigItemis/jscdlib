@@ -3,6 +3,13 @@ package de.itemis.jassuan.jscdlib;
 import jdk.incubator.foreign.CLinker;
 import jdk.incubator.foreign.MemoryAddress;
 
+/**
+ * 1:1 translation of libassuan's functions into their Java counterparts. This may be used by higher
+ * level convenience classes to provide an easy to use API for the functionality libassuan provides.
+ * 
+ * @see <a href=
+ *      "https://gnupg.org/software/libassuan/index.html">https://gnupg.org/software/libassuan/index.html</a>
+ */
 public interface JAssuanNative {
 
     /**
@@ -11,6 +18,7 @@ public interface JAssuanNative {
      * @see https://www.gnupg.org/documentation/manuals/assuan/Client-code.html
      */
     public static final int ASSUAN_INVALID_PID = 0;
+
     /**
      * With flags set to ASSUAN_SOCKET_CONNECT_FDPASSING, sendmsg and recvmesg are used for input
      * and output and thereby enable the use of descriptor passing.
