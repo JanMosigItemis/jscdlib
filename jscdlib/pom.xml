@@ -5,7 +5,12 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>de.itemis</groupId>
+	<parent>
+        <groupId>com.itemis</groupId>
+        <artifactId>org-parent</artifactId>
+        <version>5.2.0</version>
+    </parent>
+    
     <artifactId>jassuan.jscdlib</artifactId>
     <version>1.0.0-SNAPSHOT</version>
 
@@ -44,9 +49,9 @@
     </scm>
 
     <organization>
-        <name>itemis AG</name>
-        <url>https://www.itemis.com/en</url>
-    </organization>
+		<name>itemis AG</name>
+		<url>www.itemis.com</url>
+	</organization>
 
     <properties>
         <java.version>16</java.version>
@@ -56,12 +61,8 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
-        <maven-failsafe-plugin.version>3.0.0-M5</maven-failsafe-plugin.version>
-        <maven-source-plugin.version>3.2.0</maven-source-plugin.version>
-        <maven-clean-plugin.version>3.1.0</maven-clean-plugin.version>
         <maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
-        <maven-help-plugin.version>3.0.1</maven-help-plugin.version>
         <build.timestamp.formatted>${maven.build.timestamp}</build.timestamp.formatted>
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm.ssZ</maven.build.timestamp.format>
         <!-- Make sure we can use variables like ${variable.name} in resource 
@@ -93,19 +94,6 @@
 
     <dependencyManagement>
         <dependencies>
-            <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
-            <dependency>
-                <groupId>com.google.guava</groupId>
-                <artifactId>guava</artifactId>
-                <version>${guava.version}</version>
-            </dependency>
-            <dependency>
-                <!-- Required to support null annotation checks according 
-                    to JSR-305 -->
-                <groupId>com.github.spotbugs</groupId>
-                <artifactId>spotbugs</artifactId>
-                <version>${spotbugs.version}</version>
-            </dependency>
             <!-- https://mvnrepository.com/artifact/ch.qos.logback/logback-classic -->
             <dependency>
                 <groupId>ch.qos.logback</groupId>
@@ -159,18 +147,6 @@
                 <artifactId>assertj-core</artifactId>
                 <version>${assertj.version}</version>
             </dependency>
-            <!-- https://mvnrepository.com/artifact/nl.jqno.equalsverifier/equalsverifier -->
-            <dependency>
-                <groupId>nl.jqno.equalsverifier</groupId>
-                <artifactId>equalsverifier</artifactId>
-                <version>${equalsverifier.version}</version>
-            </dependency>
-            <!-- https://mvnrepository.com/artifact/org.awaitility/awaitility -->
-            <dependency>
-                <groupId>org.awaitility</groupId>
-                <artifactId>awaitility</artifactId>
-                <version>${awaitility.version}</version>
-            </dependency>
             <dependency>
                 <groupId>com.itemis</groupId>
                 <artifactId>fluffyj</artifactId>
@@ -191,18 +167,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-        </dependency>
-        <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-        </dependency>
-        <dependency>
-            <!-- Required to support null annotation checks according to 
-                JSR-305 -->
-            <groupId>com.github.spotbugs</groupId>
-            <artifactId>spotbugs</artifactId>
         </dependency>
         <dependency>
             <groupId>com.itemis</groupId>
@@ -248,16 +214,6 @@
         <dependency>
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>nl.jqno.equalsverifier</groupId>
-            <artifactId>equalsverifier</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.awaitility</groupId>
-            <artifactId>awaitility</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -322,19 +278,6 @@
                     </executions>
                 </plugin>
                 <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-source-plugin</artifactId>
-                    <version>${maven-source-plugin.version}</version>
-                    <executions>
-                        <execution>
-                            <id>attach-sources</id>
-                            <goals>
-                                <goal>jar</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
                     <groupId>com.github.spotbugs</groupId>
                     <artifactId>spotbugs-maven-plugin</artifactId>
                     <version>${spotbugs.version}</version>
@@ -356,7 +299,7 @@
                     <configuration>
                         <archive>
                             <manifestEntries>
-                                <Automatic-Module-Name>de.itemis.jassuan.jscdlib</Automatic-Module-Name>
+                                <Automatic-Module-Name>com.itemis.jassuan.jscdlib</Automatic-Module-Name>
                             </manifestEntries>
                         </archive>
                     </configuration>
@@ -371,20 +314,6 @@
                             <compilerArg>jdk.incubator.foreign</compilerArg>
                         </compilerArgs>
                     </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-help-plugin</artifactId>
-                    <version>${maven-help-plugin.version}</version>
-                    <executions>
-                        <execution>
-                            <id>show-profiles</id>
-                            <phase>compile</phase>
-                            <goals>
-                                <goal>active-profiles</goal>
-                            </goals>
-                        </execution>
-                    </executions>
                 </plugin>
             </plugins>
         </pluginManagement>
