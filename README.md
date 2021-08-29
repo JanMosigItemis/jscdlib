@@ -1,12 +1,30 @@
-# jAssuan
-Using the functionality of [libassuan](https://gnupg.org/software/libassuan/index.html) directly from Java without the need to use scripts or talking to foreign GPG processes.
+# jScdLib
+A library that may be used to work with [scdaemon](https://www.gnupg.org/documentation/manuals/gnupg/Invoking-SCDAEMON.html#Invoking-SCDAEMON) and [SmartCards](https://en.wikipedia.org/wiki/Smart_card). This may be useful for client software that deals with security keys based on OpenPGP Smart Card standards.
 
-## Lib
-The Java port of libassuan. Requires JDK17
+# Build
+mvn clean install
 
-## Demo
-A demo of the Java port of libassuan. Requires JDK17.
+# Run
+This library requires Java 16
 
-## jScdLib
-A library that makes use of [FLA](https://openjdk.java.net/jeps/389) to be able to directly speak to scdaemon. This may be useful for client software that deals with security keys based on OpenPGP Smart Card standards.
+# IDE Setup
+Due to the usage of Java16 incubator code, the following special setup is required:  
+* Add `--add-modules=jdk.incubator.foreign` to the startup JVM options of your IDE (e. g. eclipse.ini).
+* Add the following to JVM options of tests in order to be able to run them from within the IDE:
+```-Dforeign.restricted=permit --add-modules=jdk.incubator.foreign```
 
+# Usage
+## List available SmartCard readers
+```
+try (var scardHandle = JScdLib.constructSCardHandle()) {
+    scardHandle.listReaders().forEach(System.out::println);
+}
+```
+
+## Send command to scdaemon
+```
+try (var assuanHandle = JScdLib.constructAssuanHandle()) {
+    // SmartCard must be attached in order for this to show output.
+    assuanHandle.sendCommand("SERIALNO", System.out::println, System.out::println);
+}
+```
