@@ -1,8 +1,9 @@
-package com.itemis.jscdlib;
+package com.itemis.jscdlib.demo;
 
-public class JscdMain {
+import com.itemis.jscdlib.JScdLib;
+
+public class JscdLibDemoMain {
     public static void main(String[] args) {
-        System.out.println("assuan_socket_connect: " + (0x6008050 & 0xFFFF) + " " + (32768 | 80));
         try (var scardHandle = JScdLib.constructSCardHandle(); var assuanHandle = JScdLib.constructAssuanHandle()) {
             var availableReaders = scardHandle.listReaders();
             System.out.println("List of available smart card readers:");

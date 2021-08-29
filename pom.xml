@@ -12,7 +12,7 @@
     </parent>
     
     <artifactId>jscdlib</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>0.1.0-SNAPSHOT</version>
 
     <name>jScdLib</name>
     <description>Java based SmartCard Daemon Library</description>

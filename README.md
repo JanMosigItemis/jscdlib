@@ -7,6 +7,9 @@ mvn clean install
 # Run
 This library requires Java 16
 
+# Demo
+See `demo/README.md`
+
 # IDE Setup
 Due to the usage of Java16 incubator code, the following special setup is required:  
 * Add `--add-modules=jdk.incubator.foreign` to the startup JVM options of your IDE (e. g. eclipse.ini).

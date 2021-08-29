@@ -31,7 +31,7 @@ import jdk.incubator.foreign.MemoryAddress;
 
 /**
  * Provides convenient Java versions of libassuan based functionality.
- * 
+ *
  * @see <a href=
  *      "https://gnupg.org/software/libassuan/index.html">https://gnupg.org/software/libassuan/index.html</a>
  *
@@ -175,7 +175,6 @@ public final class AssuanLibHandle implements AutoCloseable {
         // False positive. Used as a function pointer callback by C-code.
         @SuppressWarnings("unused")
         public int data_cb(MemoryAddress allLines, MemoryAddress currentLine, long lineLength) {
-            System.out.println("data_cb");
             responseConsumer.accept(CLinker.toJavaStringRestricted(currentLine, UTF_8));
             return SUCCESS;
         }
@@ -183,14 +182,12 @@ public final class AssuanLibHandle implements AutoCloseable {
         // False positive. Used as a function pointer callback by C-code.
         @SuppressWarnings("unused")
         public int inquire_cb(MemoryAddress allLines, MemoryAddress currentLine) {
-            System.out.println("inquire_cb");
             return SUCCESS;
         }
 
         // False positive. Used as a function pointer callback by C-code.
         @SuppressWarnings("unused")
         public int status_cb(MemoryAddress allLines, MemoryAddress currentLine) {
-            System.out.println("status_cb");
             statusConsumer.accept(CLinker.toJavaStringRestricted(currentLine, UTF_8));
             return SUCCESS;
         }
