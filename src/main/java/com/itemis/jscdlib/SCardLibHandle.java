@@ -1,8 +1,8 @@
 package com.itemis.jscdlib;
 
-import static com.itemis.jscdlib.JScardNative.PCSC_SCOPE_SYSTEM;
-import static com.itemis.jscdlib.JScardNative.SCARD_ALL_READERS;
-import static com.itemis.jscdlib.JScardNative.SCARD_AUTOALLOCATE;
+import static com.itemis.jscdlib.ScardLibNative.PCSC_SCOPE_SYSTEM;
+import static com.itemis.jscdlib.ScardLibNative.SCARD_ALL_READERS;
+import static com.itemis.jscdlib.ScardLibNative.SCARD_AUTOALLOCATE;
 import static com.itemis.jscdlib.problem.JScdProblems.SCARD_E_NO_READERS_AVAILABLE;
 import static java.util.Objects.requireNonNull;
 
@@ -33,14 +33,14 @@ import jdk.incubator.foreign.MemoryAddress;
  *      "https://docs.microsoft.com/en-us/windows/win32/api/winscard/">https://docs.microsoft.com/en-us/windows/win32/api/winscard/</a>
  *      </p>
  */
-public final class JSCardHandle implements AutoCloseable {
+public final class SCardLibHandle implements AutoCloseable {
 
-    private static final Logger LOG = LoggerFactory.getLogger(JSCardHandle.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SCardLibHandle.class);
     private static final Set<JScdProblem> NON_FATAL_PROBLEMS = ImmutableSet.of(JScdProblems.SCARD_S_SUCCESS, JScdProblems.SCARD_E_NO_READERS_AVAILABLE);
 
-    private final JScardNative nativeBridge;
+    private final ScardLibNative nativeBridge;
 
-    public JSCardHandle(JScardNative nativeBridge) {
+    public SCardLibHandle(ScardLibNative nativeBridge) {
         this.nativeBridge = requireNonNull(nativeBridge, "nativeBridge");
     }
 

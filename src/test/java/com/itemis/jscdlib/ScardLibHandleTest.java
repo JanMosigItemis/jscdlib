@@ -1,9 +1,9 @@
 package com.itemis.jscdlib;
 
 import static ch.qos.logback.classic.Level.WARN;
-import static com.itemis.jscdlib.JScardNative.PCSC_SCOPE_SYSTEM;
-import static com.itemis.jscdlib.JScardNative.SCARD_ALL_READERS;
-import static com.itemis.jscdlib.JScardNative.SCARD_AUTOALLOCATE;
+import static com.itemis.jscdlib.ScardLibNative.PCSC_SCOPE_SYSTEM;
+import static com.itemis.jscdlib.ScardLibNative.SCARD_ALL_READERS;
+import static com.itemis.jscdlib.ScardLibNative.SCARD_AUTOALLOCATE;
 import static com.itemis.jscdlib.problem.JScdProblems.SCARD_E_NO_MEMORY;
 import static com.itemis.jscdlib.problem.JScdProblems.SCARD_E_NO_READERS_AVAILABLE;
 import static com.itemis.jscdlib.problem.JScdProblems.SCARD_S_SUCCESS;
@@ -47,9 +47,9 @@ import com.itemis.jscdlib.problem.JScdProblems;
 
 import jdk.incubator.foreign.MemoryAddress;
 
-public class JScardHandleTest {
+public class ScardLibHandleTest {
 
-    private static final Logger LOG = LoggerFactory.getLogger(JScardHandleTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ScardLibHandleTest.class);
 
     private static final String READER_ONE = "readerOne";
     private static final String READER_TWO = "readerTwo";
@@ -58,16 +58,16 @@ public class JScardHandleTest {
     FluffyTestAppender logAssert = new FluffyTestAppender();
 
     private SCardMethodInvocations invocations;
-    private JScardNative nativeMock;
-    private JSCardHandle underTest;
+    private ScardLibNative nativeMock;
+    private SCardLibHandle underTest;
 
     @BeforeEach
     public void setUp() {
-        nativeMock = mock(JScardNative.class);
+        nativeMock = mock(ScardLibNative.class);
         invocations = new SCardMethodInvocations();
         setupAllMethodsSuccess();
 
-        underTest = new JSCardHandle(nativeMock);
+        underTest = new SCardLibHandle(nativeMock);
     }
 
     @AfterEach
@@ -83,12 +83,12 @@ public class JScardHandleTest {
 
     @Test
     public void test_handle_is_final() {
-        FluffyTestHelper.assertFinal(JSCardHandle.class);
+        FluffyTestHelper.assertFinal(SCardLibHandle.class);
     }
 
     @Test
     public void test_handle_is_autoclosable() {
-        assertThat(AutoCloseable.class).as("JScd handles must be autoclossable").isAssignableFrom(JSCardHandle.class);
+        assertThat(AutoCloseable.class).as("JScd handles must be autoclossable").isAssignableFrom(SCardLibHandle.class);
     }
 
     @Test

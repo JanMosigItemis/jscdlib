@@ -3,24 +3,22 @@ package com.itemis.jscdlib.internal;
 import static jdk.incubator.foreign.CLinker.C_INT;
 import static jdk.incubator.foreign.CLinker.C_POINTER;
 
-import com.itemis.jscdlib.JAssuanNative;
+import com.itemis.jscdlib.AssuanLibNative;
 import com.itemis.jscdlib.internal.memory.NativeMethodHandle;
 
 import jdk.incubator.foreign.CLinker;
 import jdk.incubator.foreign.LibraryLookup;
 import jdk.incubator.foreign.MemoryAddress;
 
-public class JAssuanNativeMacImpl extends NativeBase implements JAssuanNative {
+public class AssuanLibNativeWinImpl extends NativeBase implements AssuanLibNative {
 
     private final NativeMethodHandle<Long> assuanNew;
     private final NativeMethodHandle<Long> assuanRelease;
     private final NativeMethodHandle<Long> assuanSocketConnect;
     private final NativeMethodHandle<Long> assuanTransact;
 
-    public JAssuanNativeMacImpl() {
-        // See
-        // https://github.com/gpg/gnupg/blob/25ae80b8eb6e9011049d76440ad7d250c1d02f7c/scd/scdaemon.c#L210
-        var lib = LibraryLookup.ofLibrary("/System/Library/Frameworks/PCSC.framework/PCSC");
+    public AssuanLibNativeWinImpl() {
+        var lib = LibraryLookup.ofLibrary("libassuan6-0");
         assuanNew = NativeMethodHandle
             .ofLib(lib)
             .returnType(long.class)

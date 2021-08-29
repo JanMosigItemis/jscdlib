@@ -1,8 +1,8 @@
 package com.itemis.jscdlib;
 
 import static com.itemis.fluffyj.exceptions.ThrowablePrettyfier.pretty;
-import static com.itemis.jscdlib.JAssuanNative.ASSUAN_INVALID_PID;
-import static com.itemis.jscdlib.JAssuanNative.ASSUAN_SOCKET_CONNECT_FDPASSING;
+import static com.itemis.jscdlib.AssuanLibNative.ASSUAN_INVALID_PID;
+import static com.itemis.jscdlib.AssuanLibNative.ASSUAN_SOCKET_CONNECT_FDPASSING;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Objects.requireNonNull;
 import static jdk.incubator.foreign.CLinker.C_INT;
@@ -36,16 +36,16 @@ import jdk.incubator.foreign.MemoryAddress;
  *      "https://gnupg.org/software/libassuan/index.html">https://gnupg.org/software/libassuan/index.html</a>
  *
  */
-public final class JAssuanHandle implements AutoCloseable {
+public final class AssuanLibHandle implements AutoCloseable {
 
-    private static final Logger LOG = LoggerFactory.getLogger(JAssuanHandle.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AssuanLibHandle.class);
 
     private static final CLinker LINKER = CLinker.getInstance();
     private static final Set<JScdProblem> NON_FATAL_PROBLEMS = ImmutableSet.of(JScdProblems.SCARD_S_SUCCESS);
 
     private final LongPointerSegment ctxPtr;
     private final MemoryAddress ctxAddr;
-    private final JAssuanNative nativeBridge;
+    private final AssuanLibNative nativeBridge;
 
     private volatile boolean isClosed = false;
 
@@ -59,7 +59,7 @@ public final class JAssuanHandle implements AutoCloseable {
      * @param socketDiscovery Used to determine the scdaemon socket file to use for communication to
      *        the daemon.
      */
-    public JAssuanHandle(JAssuanNative nativeBridge, JScdSocketDiscovery socketDiscovery) {
+    public AssuanLibHandle(AssuanLibNative nativeBridge, JScdSocketDiscovery socketDiscovery) {
         this.nativeBridge = requireNonNull(nativeBridge, "nativeBridge");
         requireNonNull(socketDiscovery, "socketDiscovery");
 

@@ -3,21 +3,21 @@ package com.itemis.jscdlib.internal;
 import static jdk.incubator.foreign.CLinker.C_LONG_LONG;
 import static jdk.incubator.foreign.CLinker.C_POINTER;
 
-import com.itemis.jscdlib.JScardNative;
+import com.itemis.jscdlib.ScardLibNative;
 import com.itemis.jscdlib.internal.memory.NativeMethodHandle;
 
 import jdk.incubator.foreign.CLinker;
 import jdk.incubator.foreign.LibraryLookup;
 import jdk.incubator.foreign.MemoryAddress;
 
-public class JScardNativeWinImpl extends NativeBase implements JScardNative {
+public class ScardLibNativeWinImpl extends NativeBase implements ScardLibNative {
 
     private final NativeMethodHandle<Long> establishCtx;
     private final NativeMethodHandle<Long> listReaders;
     private final NativeMethodHandle<Long> freeMem;
     private final NativeMethodHandle<Long> releaseCtx;
 
-    public JScardNativeWinImpl() {
+    public ScardLibNativeWinImpl() {
         var lib = LibraryLookup.ofLibrary("winscard");
         establishCtx = NativeMethodHandle
             .ofLib(lib)

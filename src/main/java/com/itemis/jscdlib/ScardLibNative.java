@@ -6,7 +6,7 @@ import jdk.incubator.foreign.MemoryAddress;
  * Implementations of this interface know how to call native smart card functions via OS libraries.
  * It abstracts away the knowledge how exactly this is done (e. g. JNI, JNA, FLA).
  */
-public interface JScardNative {
+public interface ScardLibNative {
 
     /**
      * According to the spec, this is a null pointer.

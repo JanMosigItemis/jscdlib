@@ -6,23 +6,23 @@ import static jdk.incubator.foreign.CLinker.C_POINTER;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.itemis.jscdlib.JAssuanNative;
+import com.itemis.jscdlib.AssuanLibNative;
 import com.itemis.jscdlib.internal.memory.NativeMethodHandle;
 
 import jdk.incubator.foreign.CLinker;
 import jdk.incubator.foreign.LibraryLookup;
 import jdk.incubator.foreign.MemoryAddress;
 
-public class JAssuanNativeLinuxImpl extends NativeBase implements JAssuanNative {
+public class AssuanLibNativeLinuxImpl extends NativeBase implements AssuanLibNative {
 
-    private static final Logger LOG = LoggerFactory.getLogger(JAssuanNativeLinuxImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AssuanLibNativeLinuxImpl.class);
 
     private final NativeMethodHandle<Long> assuanNew;
     private final NativeMethodHandle<Long> assuanRelease;
     private final NativeMethodHandle<Long> assuanSocketConnect;
     private final NativeMethodHandle<Long> assuanTransact;
 
-    public JAssuanNativeLinuxImpl() {
+    public AssuanLibNativeLinuxImpl() {
         var lib = loadLib();
 
         assuanNew = NativeMethodHandle

@@ -3,21 +3,21 @@ package com.itemis.jscdlib.internal;
 import static jdk.incubator.foreign.CLinker.C_LONG;
 import static jdk.incubator.foreign.CLinker.C_POINTER;
 
-import com.itemis.jscdlib.JScardNative;
+import com.itemis.jscdlib.ScardLibNative;
 import com.itemis.jscdlib.internal.memory.NativeMethodHandle;
 
 import jdk.incubator.foreign.CLinker;
 import jdk.incubator.foreign.LibraryLookup;
 import jdk.incubator.foreign.MemoryAddress;
 
-public class JScardNativeMacImpl extends NativeBase implements JScardNative {
+public class ScardLibNativeMacImpl extends NativeBase implements ScardLibNative {
 
     private final NativeMethodHandle<Long> establishCtx;
     private final NativeMethodHandle<Long> listReaders;
     private final NativeMethodHandle<Long> freeMem;
     private final NativeMethodHandle<Long> releaseCtx;
 
-    public JScardNativeMacImpl() {
+    public ScardLibNativeMacImpl() {
         // See
         // https://github.com/gpg/gnupg/blob/25ae80b8eb6e9011049d76440ad7d250c1d02f7c/scd/scdaemon.c#L210
         var lib = LibraryLookup.ofLibrary("/System/Library/Frameworks/PCSC.framework/PCSC");

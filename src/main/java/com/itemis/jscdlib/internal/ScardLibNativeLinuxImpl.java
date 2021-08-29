@@ -6,23 +6,23 @@ import static jdk.incubator.foreign.CLinker.C_POINTER;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.itemis.jscdlib.JScardNative;
+import com.itemis.jscdlib.ScardLibNative;
 import com.itemis.jscdlib.internal.memory.NativeMethodHandle;
 
 import jdk.incubator.foreign.CLinker;
 import jdk.incubator.foreign.LibraryLookup;
 import jdk.incubator.foreign.MemoryAddress;
 
-public class JScardNativeLinuxImpl extends NativeBase implements JScardNative {
+public class ScardLibNativeLinuxImpl extends NativeBase implements ScardLibNative {
 
-    private static final Logger LOG = LoggerFactory.getLogger(JScardNativeLinuxImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ScardLibNativeLinuxImpl.class);
 
     private final NativeMethodHandle<Long> establishCtx;
     private final NativeMethodHandle<Long> listReaders;
     private final NativeMethodHandle<Long> freeMem;
     private final NativeMethodHandle<Long> releaseCtx;
 
-    public JScardNativeLinuxImpl() {
+    public ScardLibNativeLinuxImpl() {
         var lib = loadLib();
         establishCtx = NativeMethodHandle
             .ofLib(lib)

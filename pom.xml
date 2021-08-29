@@ -39,13 +39,13 @@
         </developer>
     </developers>
 
-    <url>https://github.com/JanMosigItemis/jassuan</url>
+    <url>https://github.com/JanMosigItemis/jscdlib</url>
 
     <scm>
-        <connection>scm:git:https://github.com/JanMosigItemis/jassuan</connection>
-        <developerConnection>scm:git:https://github.com/JanMosigItemis/jassuan</developerConnection>
+        <connection>scm:git:https://github.com/JanMosigItemis/jscdlib</connection>
+        <developerConnection>scm:git:https://github.com/JanMosigItemis/jscdlib</developerConnection>
         <tag>HEAD</tag>
-        <url>https://github.com/JanMosigItemis/jassuan</url>
+        <url>https://github.com/JanMosigItemis/jscdlib</url>
     </scm>
 
     <organization>
@@ -299,7 +299,7 @@
                     <configuration>
                         <archive>
                             <manifestEntries>
-                                <Automatic-Module-Name>com.itemis.jassuan.jscdlib</Automatic-Module-Name>
+                                <Automatic-Module-Name>com.itemis.jscdlib</Automatic-Module-Name>
                             </manifestEntries>
                         </archive>
                     </configuration>

@@ -3,12 +3,12 @@ package com.itemis.jscdlib;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.itemis.jscdlib.internal.JAssuanNativeLinuxImpl;
-import com.itemis.jscdlib.internal.JAssuanNativeMacImpl;
-import com.itemis.jscdlib.internal.JAssuanNativeWinImpl;
-import com.itemis.jscdlib.internal.JScardNativeLinuxImpl;
-import com.itemis.jscdlib.internal.JScardNativeMacImpl;
-import com.itemis.jscdlib.internal.JScardNativeWinImpl;
+import com.itemis.jscdlib.internal.AssuanLibNativeLinuxImpl;
+import com.itemis.jscdlib.internal.AssuanLibNativeMacImpl;
+import com.itemis.jscdlib.internal.AssuanLibNativeWinImpl;
+import com.itemis.jscdlib.internal.ScardLibNativeLinuxImpl;
+import com.itemis.jscdlib.internal.ScardLibNativeMacImpl;
+import com.itemis.jscdlib.internal.ScardLibNativeWinImpl;
 import com.itemis.jscdlib.internal.OsDetector;
 
 /**
@@ -40,7 +40,7 @@ public final class JScdLib {
 
     /**
      * <p>
-     * Create a new handle. The handle will use the {@link JScardNative} implementation appropriate
+     * Create a new handle. The handle will use the {@link ScardLibNative} implementation appropriate
      * for the current OS.
      * </p>
      * <p>
@@ -48,25 +48,25 @@ public final class JScdLib {
      * needed anymore in order to prevent resource leaks.
      * </p>
      *
-     * @return A new instance of {@link JSCardHandle}.
+     * @return A new instance of {@link SCardLibHandle}.
      */
-    public static JSCardHandle constructSCardHandle() {
-        JScardNative nativeImpl = null;
+    public static SCardLibHandle constructSCardHandle() {
+        ScardLibNative nativeImpl = null;
 
         if (IS_WINDOWS) {
-            nativeImpl = new JScardNativeWinImpl();
+            nativeImpl = new ScardLibNativeWinImpl();
         } else if (IS_MAC) {
-            nativeImpl = new JScardNativeMacImpl();
+            nativeImpl = new ScardLibNativeMacImpl();
         } else {
-            nativeImpl = new JScardNativeLinuxImpl();
+            nativeImpl = new ScardLibNativeLinuxImpl();
         }
 
-        return new JSCardHandle(nativeImpl);
+        return new SCardLibHandle(nativeImpl);
     }
 
     /**
      * <p>
-     * Create a new handle. The handle will use the {@link JAssuanNative} implementation appropriate
+     * Create a new handle. The handle will use the {@link AssuanLibNative} implementation appropriate
      * for the current OS.
      * </p>
      * <p>
@@ -74,19 +74,19 @@ public final class JScdLib {
      * needed anymore in order to prevent resource leaks.
      * </p>
      *
-     * @return A new instance of {@link JAssuanHandle}.
+     * @return A new instance of {@link AssuanLibHandle}.
      */
-    public static JAssuanHandle constructAssuanHandle() {
-        JAssuanNative nativeImpl = null;
+    public static AssuanLibHandle constructAssuanHandle() {
+        AssuanLibNative nativeImpl = null;
 
         if (IS_WINDOWS) {
-            nativeImpl = new JAssuanNativeWinImpl();
+            nativeImpl = new AssuanLibNativeWinImpl();
         } else if (IS_MAC) {
-            nativeImpl = new JAssuanNativeMacImpl();
+            nativeImpl = new AssuanLibNativeMacImpl();
         } else {
-            nativeImpl = new JAssuanNativeLinuxImpl();
+            nativeImpl = new AssuanLibNativeLinuxImpl();
         }
 
-        return new JAssuanHandle(nativeImpl, new JScdGpgConfSocketDiscovery(new JScdEnvSocketDiscovery()));
+        return new AssuanLibHandle(nativeImpl, new JScdGpgConfSocketDiscovery(new JScdEnvSocketDiscovery()));
     }
 }

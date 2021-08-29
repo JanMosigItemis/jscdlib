@@ -4,8 +4,8 @@ import static ch.qos.logback.classic.Level.WARN;
 import static com.itemis.fluffyj.exceptions.ThrowablePrettyfier.pretty;
 import static com.itemis.fluffyj.tests.FluffyTestHelper.assertNullArgNotAccepted;
 import static com.itemis.fluffyj.tests.exceptions.ExpectedExceptions.EXPECTED_CHECKED_EXCEPTION;
-import static com.itemis.jscdlib.JAssuanNative.ASSUAN_INVALID_PID;
-import static com.itemis.jscdlib.JAssuanNative.ASSUAN_SOCKET_CONNECT_FDPASSING;
+import static com.itemis.jscdlib.AssuanLibNative.ASSUAN_INVALID_PID;
+import static com.itemis.jscdlib.AssuanLibNative.ASSUAN_SOCKET_CONNECT_FDPASSING;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -35,23 +35,23 @@ import com.itemis.jscdlib.problem.JScdProblems;
 
 import jdk.incubator.foreign.MemoryAddress;
 
-public class JAssuanHandleTest {
+public class AssuanLibHandleTest {
 
     private static final Answer<Long> SUCCESS = invocation -> JScdProblems.SCARD_S_SUCCESS.errorCode();
 
     @RegisterExtension
     FluffyTestAppender logAssert = new FluffyTestAppender();
 
-    private JAssuanNative nativeMock;
+    private AssuanLibNative nativeMock;
     private JScdEnvSocketDiscovery socketDiscoveryMock;
 
     private AssuanMethodInvocations invocations;
 
-    private JAssuanHandle underTest;
+    private AssuanLibHandle underTest;
 
     @BeforeEach
     public void setUp() {
-        nativeMock = mock(JAssuanNative.class);
+        nativeMock = mock(AssuanLibNative.class);
         socketDiscoveryMock = mock(JScdEnvSocketDiscovery.class);
         invocations = new AssuanMethodInvocations();
 
@@ -77,12 +77,12 @@ public class JAssuanHandleTest {
 
     @Test
     public void constructorDoesNotAcceptNullAsNativeBridge() {
-        assertNullArgNotAccepted(() -> new JAssuanHandle(null, socketDiscoveryMock), "nativeBridge");
+        assertNullArgNotAccepted(() -> new AssuanLibHandle(null, socketDiscoveryMock), "nativeBridge");
     }
 
     @Test
     public void constructorDoesNotAcceptNullAsSocketDiscovery() {
-        assertNullArgNotAccepted(() -> new JAssuanHandle(nativeMock, null), "socketDiscovery");
+        assertNullArgNotAccepted(() -> new AssuanLibHandle(nativeMock, null), "socketDiscovery");
     }
 
     @Test
@@ -204,7 +204,7 @@ public class JAssuanHandleTest {
         doAnswer(answer).when(nativeMock).assuanRelease(any(MemoryAddress.class));
     }
 
-    private JAssuanHandle constructUnderTest() {
-        return new JAssuanHandle(nativeMock, socketDiscoveryMock);
+    private AssuanLibHandle constructUnderTest() {
+        return new AssuanLibHandle(nativeMock, socketDiscoveryMock);
     }
 }

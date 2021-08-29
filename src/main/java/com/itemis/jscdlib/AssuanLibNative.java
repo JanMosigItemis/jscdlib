@@ -10,7 +10,7 @@ import jdk.incubator.foreign.MemoryAddress;
  * @see <a href=
  *      "https://gnupg.org/software/libassuan/index.html">https://gnupg.org/software/libassuan/index.html</a>
  */
-public interface JAssuanNative {
+public interface AssuanLibNative {
 
     /**
      * If you don’t know the server’s process ID (PID), pass ASSUAN_INVALID_PID.
