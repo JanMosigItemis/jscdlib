@@ -13,7 +13,7 @@
     </parent>
 
     <artifactId>jscdlib.demo</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
 
     <name>jScdLib Demo</name>
     <description>Demonstration of jScdLib</description>
@@ -73,6 +73,7 @@
         <spotbugs.version>4.2.3</spotbugs.version>
         <git-commit-id-plugin.version>4.0.4</git-commit-id-plugin.version>
         <logback.version>1.2.3</logback.version>
+        <jscdlib.version>0.1.0</jscdlib.version>
     </properties>
 
     <dependencyManagement>
@@ -86,7 +87,7 @@
             <dependency>
                 <groupId>com.itemis</groupId>
                 <artifactId>jscdlib</artifactId>
-                <version>0.1.0-SNAPSHOT</version>
+                <version>${jscdlib.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
