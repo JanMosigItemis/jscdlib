@@ -11,7 +11,7 @@
         <version>5.2.0</version>
     </parent>
     
-    <artifactId>jassuan.jscdlib</artifactId>
+    <artifactId>jscdlib</artifactId>
     <version>1.0.0-SNAPSHOT</version>
 
     <name>jScdLib</name>
