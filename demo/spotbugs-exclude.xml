@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <FindBugsFilter>
-	<!-- Seems like Spotbugs creates a false positive here. Maybe due to the weirdness of the generated lib code.
-		 However, it seems to be safe to ignore this error for our demoing purposes. -->
-    <Match>
-        <Class name="de.itemis.mosig.jassuan.demo.JAssuanDemo" />
-        <Method name="assuan_generated" />
-        <Bug pattern="REC_CATCH_EXCEPTION" />
-    </Match>
+    <!-- <Match>
+        <Class name="some.class" />
+        <Method name="someMethod" />
+        <Bug pattern="SOME_BUG" />
+    </Match> -->
 </FindBugsFilter>

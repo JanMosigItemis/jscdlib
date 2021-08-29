@@ -1,5 +1,13 @@
-# jAssuan Library Demo
-## Build & Run
-Make sure, you have a working JDK17 installed. Currently, the jAssuan lib is not available on Maven Central, so you are going to need to compile it yourself before executing the demo.  
-  
-`JAVA_HOME=/path/to/jdk17 mvn clean verify`
+# jScdLib Demo
+Demonstration of jScdLib.
+
+# Build
+mvn clean install
+
+# Run
+This demo requires Java 16.  
+
+```
+java --add-modules jdk.incubator.foreign -Dforeign.restricted=permit -jar target/jscdlib.demo-1.0.0-SNAPSHOT-shaded.jar
+```
+
